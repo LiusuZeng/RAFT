@@ -31,10 +31,10 @@ public class Comm implements Runnable {
 
 	public void send(int recvID, Object obj) {
 		try {
-			Socket tell = new Socket(this.motherIP, this.motherPort);
+			String tar_ip = this.sysConfig.get(recvID).getEntryIP();
+			int tar_port = this.sysConfig.get(recvID).getEntryPort();
+			Socket tell = new Socket(tar_ip, tar_port);
 			ObjectOutputStream oos = new ObjectOutputStream(tell.getOutputStream());
-			oos.writeObject("SEND");
-			oos.writeObject(recvID);
 			oos.writeObject(obj);
 			oos.flush();
 			//
@@ -55,27 +55,16 @@ public class Comm implements Runnable {
 		ServerSocket mother = null;
 		try {
 			mother = new ServerSocket(this.motherPort);
-			int recvID = -1;
 			Object msg = null;
-			String type = null;
 			//
 			while(!this.StopSign)
 			{
 				Socket son = mother.accept();
 				// get para
-				recvID = -1;
-				msg = null;
-				//
 				ObjectInputStream ois = new ObjectInputStream(son.getInputStream());
-				type = (String)ois.readObject();
-				if(type.equals("SEND"))
-				{
-					recvID = (int)ois.readInt();
-					msg = ois.readObject();
-				}
-				else msg = ois.readObject();
+				msg = ois.readObject();
 				//
-				CommProcessThr Employee = new CommProcessThr(recvID, msg, this.sysConfig, this.role);
+				CommProcessThr Employee = new CommProcessThr(msg, this.role);
 				Employee.start();
 				//
 				ois.close();
