@@ -1,0 +1,13 @@
+APPEND Term: 1, Index: 0, Value: 33
+APPEND Term: 1, Index: 1, Value: 69
+APPEND Term: 1, Index: 2, Value: 97
+APPEND Term: 2, Index: 3, Value: 53
+APPEND Term: 2, Index: 4, Value: 10
+APPEND Term: 2, Index: 5, Value: 15
+APPEND Term: 3, Index: 6, Value: 35
+APPEND Term: 3, Index: 7, Value: 70
+APPEND Term: 3, Index: 8, Value: 13
+APPEND Term: 4, Index: 9, Value: 25
+DELETE IndexFrom: 5, IndexUntil: 6
+DELETE IndexFrom: 4, IndexUntil: 6
+DELETE IndexFrom: 0, IndexUntil: 1
