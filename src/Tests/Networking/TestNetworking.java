@@ -12,6 +12,7 @@ public class TestNetworking {
 			TestRole tr2 = new TestRole(2);
 			//
 			tr1.sendVoteMsg(2);
+			tr2.sendVoteMsg(1);
 			//
 			Thread.sleep(3000);
 			tr1.comm.Terminator();
