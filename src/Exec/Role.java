@@ -276,6 +276,9 @@ public class Role implements Runnable{
 				logs.addAll(amsg.getLogs());
 				writeAppendLogs(lastCommonIndex+1, logs.size());
 				commitIndex = Math.min(logs.size()-1,  leaderCommittedIndex);
+				// LZ
+				assert(appliedIndex <= commitIndex);
+				appliedIndex = commitIndex;
 				return true;
 			}
 			else {

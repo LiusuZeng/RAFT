@@ -46,7 +46,7 @@ public class Candidate {
 			while(remainingTime > 0) {
 				Date oldDate = new Date();
 				try {
-					wait(remainingTime);					
+					wait(remainingTime);		
 				} 
 				catch (InterruptedException e) {
 					// TODO Auto-generated catch block
