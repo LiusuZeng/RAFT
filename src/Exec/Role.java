@@ -313,7 +313,7 @@ public class Role implements Runnable{
 		return;
 	}
 	
-	public void sendAppendMsg(int recvID, int prevTerm, int prevIndex, 
+	public synchronized void sendAppendMsg(int recvID, int prevTerm, int prevIndex, 
 			List<LogEntry> logToAppend) {
 		AppendMsg amsg = new AppendMsg(term, prevTerm, prevIndex, ID,
 			commitIndex, logToAppend);
@@ -321,7 +321,7 @@ public class Role implements Runnable{
 		comm.send(recvID, amsg);
 	}
 	
-	public void sendVoteMsg(int recvID) {
+	public synchronized void sendVoteMsg(int recvID) {
 		VoteMsg vmsg = new VoteMsg(term, 
 				logs.get(logs.size()-1).getTerm(),
 				logs.size()-1, ID);
@@ -329,13 +329,13 @@ public class Role implements Runnable{
 		comm.send(recvID, vmsg);
 	}
 	
-	public void sendAckAppendMsg(int recvID, boolean success) {
+	public synchronized void sendAckAppendMsg(int recvID, boolean success) {
 		AckAppendMsg aamsg = 
 				new AckAppendMsg(leaderID, term, ID, success, logs.size()-1);
 		comm.send(recvID, aamsg);
 	}
 	
-	public void sendAckVoteMsg(int recvID, boolean success) {
+	public synchronized void sendAckVoteMsg(int recvID, boolean success) {
 		AckVoteMsg avmsg = new AckVoteMsg(recvID, term, ID, success);
 		comm.send(recvID, avmsg);
 	}	
