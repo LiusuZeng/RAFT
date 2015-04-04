@@ -6,12 +6,13 @@ import Message.AckVoteMsg;
 import Message.AppendMsg;
 import Message.LogEntry;
 import Message.VoteMsg;
+
 import java.util.*;
 import java.io.*;
 
 public class TestRole extends Role {
 
-	public TestRole(int id) throws FileNotFoundException
+	public TestRole(int id) throws IOException
 	{
 		super(id);
 	}

@@ -1,6 +1,6 @@
 package Tests.Networking;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class TestNetworking {
 
@@ -19,7 +19,7 @@ public class TestNetworking {
 			tr2.comm.Terminator();
 			System.out.println("Resources retrieved.");
 			
-		} catch (FileNotFoundException | InterruptedException e) {
+		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

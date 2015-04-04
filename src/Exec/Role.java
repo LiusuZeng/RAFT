@@ -1,11 +1,10 @@
 package Exec;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 import Comm.Comm;
+import Comm.CommUtil;
 import Constants.Constants;
 import Message.AckAppendMsg;
 import Message.AckVoteMsg;
@@ -19,25 +18,24 @@ public class Role implements Runnable{
 	private Leader leader;
 	private Candidate candidate;
 	private Follower follower;
-	
+
 	public final int ID;
 	private int term;
 	private int votedFor;
 	private int leaderID;
-	
+
 	private List<LogEntry> logs;
-	
+
 	// volatile state
 	private int commitIndex; // materialized
 	private int appliedIndex; // already applied, in memory
-	
+
 	public final Comm comm;
-	
+
 	// other parameters
 	private boolean alive;
-	
-	public Role(int ID) throws FileNotFoundException {
-		this.logFile = new PrintWriter(Constants.logFile+ID);
+
+	public Role(int ID) throws IOException {
 		this.state = State.Follower;
 		this.leader = null;
 		this.candidate = null;
@@ -46,13 +44,21 @@ public class Role implements Runnable{
 		this.term = 0;
 		this.votedFor = -1;
 		this.leaderID = -1;
-		this.logs = new ArrayList<LogEntry>();
-		this.commitIndex = -1;
-		this.appliedIndex = -1;
 		this.comm = new Comm(this);
 		this.alive = true;
+		this.commitIndex = -1;
+		this.appliedIndex = -1;
+		//
+		this.role_init();
+		this.logFile = new PrintWriter(new FileWriter(Constants.logFile+ID, true));
 	}
-	
+
+	private void role_init()
+	{
+		this.logs = CommUtil.recoverLogging(new File(Constants.logFile+ID));
+		if(this.logs == null) this.logs = new ArrayList<LogEntry>(); // in case there is no log file
+	}
+
 	public void run() {
 		// TODO Auto-generated method stub
 		while(isAlive()) {
@@ -80,58 +86,58 @@ public class Role implements Runnable{
 			}
 		}
 	}
-	
+
 	public State getState() {
 		return state;
 	}
-	
+
 	public boolean isAlive() {
 		return alive;
 	}
-	
+
 	public int getLastIndex() {
 		return logs.size()-1;
 	}
-		
+
 	public synchronized void setCommitIndex(int commitIndex) {
 		assert(this.commitIndex <= commitIndex);
 		this.commitIndex = commitIndex;
 	}
-	
+
 	public synchronized LogEntry getLog(int index) {
 		if(index < logs.size())
 			return logs.get(index);
 		else
 			return null;
 	}
-	
+
 	public synchronized List<LogEntry> getLogs(int startIndex) {
 		return logs.subList(startIndex, logs.size());
 	}
-	
+
 	public int getVotedFor() {
 		return votedFor;
 	}
-	
+
 	public synchronized void win() {
 		state = State.Leader;
 	}
-	
+
 	public synchronized void lose() {
 		state = State.Follower;
 	}
-	
+
 	public synchronized void elect() {
 		state = State.Candidate;
 	}
-	
+
 	public synchronized void prepareElection() {
 		assert(state == State.Candidate);
 		++term;
 		votedFor = ID;
 		leaderID = -1;
 	}	
-	
+
 	public void recvMsg(Object msg) {
 		if(msg == null)
 			return;
@@ -151,7 +157,7 @@ public class Role implements Runnable{
 			// just ignore
 		}
 	}
-	
+
 	public synchronized void ackAppendMsgHandler(AckAppendMsg aamsg) {
 		if(state != State.Leader) {
 			return;
@@ -181,7 +187,7 @@ public class Role implements Runnable{
 			// just ignore
 		}
 	}
-	
+
 	public synchronized void ackVoteMsgHandler(AckVoteMsg avmsg) {
 		if(state != State.Candidate) {
 			return;
@@ -204,7 +210,7 @@ public class Role implements Runnable{
 			// just ignore
 		}
 	}
-	
+
 	public synchronized void appendMsgHandler(AppendMsg amsg) {		
 		int aTerm = amsg.getTerm();
 		boolean result = false;
@@ -235,7 +241,7 @@ public class Role implements Runnable{
 		// send back result to sender
 		sendAckAppendMsg(amsg.getLeaderID(), result);
 	}
-	
+
 	public synchronized void voteMsgHandler(VoteMsg vmsg) {
 		int voteTerm = vmsg.getCurrTerm();		
 		boolean acceptVote = false;
@@ -263,7 +269,7 @@ public class Role implements Runnable{
 	public synchronized boolean appendLogs(AppendMsg amsg) {
 		assert(amsg.getLeaderID() == leaderID);
 		assert(amsg.getTerm() == term);
-		
+
 		int lastCommonTerm = amsg.getPrevTerm();
 		int lastCommonIndex = amsg.getPrevIndex();
 		int leaderCommittedIndex = amsg.getCommitedIndex();
@@ -289,7 +295,7 @@ public class Role implements Runnable{
 			return false;
 		}
 	}
-	
+
 	public synchronized boolean appendLogs(List<LogEntry> logList) {
 		if(state != State.Leader)
 			return false;
@@ -301,29 +307,29 @@ public class Role implements Runnable{
 		writeAppendLogs(startIndex, endIndex);
 		return true;
 	}
-	
+
 	public synchronized void writeDeleteLogs(int startIndex, int endIndex) {
-		
+
 		logFile.printf("DELETE IndexFrom: %d, IndexUntil: %d\n", 
 				startIndex, endIndex-1);	
 		return;
 	}
-	
+
 	public synchronized void writeAppendLogs(int startIndex, int endIndex) {
 		for(int i = startIndex; i < endIndex; ++i)
 			logFile.printf("APPEND Term: %d, Index: %d, Value: %d\n", 
 					term, i, logs.get(i).getIns().getValue());	
 		return;
 	}
-	
+
 	public synchronized void sendAppendMsg(int recvID, int prevTerm, int prevIndex, 
 			List<LogEntry> logToAppend) {
 		AppendMsg amsg = new AppendMsg(term, prevTerm, prevIndex, ID,
-			commitIndex, logToAppend);
+				commitIndex, logToAppend);
 		// call COMM function to send
 		comm.send(recvID, amsg);
 	}
-	
+
 	public synchronized void sendVoteMsg(int recvID) {
 		VoteMsg vmsg = new VoteMsg(term, 
 				logs.get(logs.size()-1).getTerm(),
@@ -331,13 +337,13 @@ public class Role implements Runnable{
 		// call COMM function to send
 		comm.send(recvID, vmsg);
 	}
-	
+
 	public synchronized void sendAckAppendMsg(int recvID, boolean success) {
 		AckAppendMsg aamsg = 
 				new AckAppendMsg(leaderID, term, ID, success, logs.size()-1);
 		comm.send(recvID, aamsg);
 	}
-	
+
 	public synchronized void sendAckVoteMsg(int recvID, boolean success) {
 		AckVoteMsg avmsg = new AckVoteMsg(recvID, term, ID, success);
 		comm.send(recvID, avmsg);
