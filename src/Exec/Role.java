@@ -56,7 +56,8 @@ public class Role implements Runnable{
 
 	private void role_init()
 	{
-		this.logs = CommUtil.recoverLogging(new File(Constants.logFile+ID));
+		File myLogFile = new File(Constants.logFile+ID);
+		if(myLogFile.exists()) this.logs = CommUtil.recoverLogging(myLogFile);
 		if(this.logs == null || this.logs.isEmpty())
 		{
 			this.logs = new ArrayList<LogEntry>(0);
