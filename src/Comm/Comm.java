@@ -51,7 +51,7 @@ public class Comm implements Runnable {
 			this.mother.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.out.println("Resources already retrieved!");
 		}
 	}
