@@ -9,6 +9,7 @@ import Constants.Constants;
 import Message.AckAppendMsg;
 import Message.AckVoteMsg;
 import Message.AppendMsg;
+import Message.Instruction;
 import Message.LogEntry;
 import Message.VoteMsg;
 
@@ -56,7 +57,11 @@ public class Role implements Runnable{
 	private void role_init()
 	{
 		this.logs = CommUtil.recoverLogging(new File(Constants.logFile+ID));
-		if(this.logs == null) this.logs = new ArrayList<LogEntry>(); // in case there is no log file
+		if(this.logs == null || this.logs.isEmpty())
+		{
+			this.logs = new ArrayList<LogEntry>(0);
+			this.logs.add(new LogEntry(0, 0, new Instruction(0)));
+		}
 	}
 
 	public void run() {
@@ -350,6 +355,18 @@ public class Role implements Runnable{
 	public synchronized void sendAckVoteMsg(int recvID, boolean success) {
 		AckVoteMsg avmsg = new AckVoteMsg(recvID, term, ID, success);
 		comm.send(recvID, avmsg);
-	}	
+	}
+	
+	// LZ debug
+	public void printDebug()
+	{
+		System.out.println("***[DEBUG]***");
+		System.out.println("ID: " + this.ID);
+		System.out.println("State: " + this.getState());
+		System.out.println("Term: " + this.getTerm());
+		System.out.println("Last Index: " + this.getLastIndex());
+		System.out.println("Voted for: " + this.getVotedFor() + "\n");
+
+	}
 }
 

@@ -28,6 +28,9 @@ public class Follower {
 	public void run() {
 		synchronized(role) {
 			while(true) {
+				//
+				role.printDebug();
+				//
 				assert(role.getState() == State.Follower);
 				if(isTimeout()) {
 					role.elect();
@@ -36,7 +39,7 @@ public class Follower {
 				else
 				{
 					try {
-						wait(Constants.Constants.refreshRate);
+						role.wait(Constants.Constants.refreshRate);
 					} 
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block

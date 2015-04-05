@@ -40,7 +40,7 @@ public class Comm implements Runnable {
 			//
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 			return;
 		}
 	}

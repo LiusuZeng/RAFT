@@ -90,6 +90,9 @@ public class Leader {
 	public void run() {
 		synchronized(role) {
 			while(role.getState() == State.Leader) {
+				//
+				role.printDebug();
+				//
 				List<Request> rqsts = getRequest();
 				if(rqsts != null) {
 					// convert request to log entry
@@ -107,7 +110,7 @@ public class Leader {
 				}
 				else {
 					try {
-						wait(timeRemaining);
+						role.wait(timeRemaining);
 					} 
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block

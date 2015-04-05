@@ -2,14 +2,15 @@ package Exec;
 
 import java.io.IOException;
 
-public class RoleTest extends Role {
+public class RoleTest {
+	public Role myrole;
 	
 	public RoleTest(int ID) throws IOException {
-		super(ID);
+		myrole = new Role(ID);
 		// TODO Auto-generated constructor stub
 	}
 
 	public void setAlive (boolean value) {
-		alive = value;
+		myrole.alive = value;
 	}
 }

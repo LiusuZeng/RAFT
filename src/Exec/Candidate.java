@@ -44,9 +44,12 @@ public class Candidate {
 			role.prepareElection();
 			election();
 			while(remainingTime > 0) {
+				//
+				role.printDebug();
+				//
 				Date oldDate = new Date();
 				try {
-					wait(remainingTime);		
+					role.wait(remainingTime);		
 				} 
 				catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -72,7 +75,7 @@ public class Candidate {
 			// backoff a randomized time		
 			int backOffTime = rand.nextInt((int) Constants.backOffTimeout);
 			try {
-				wait(backOffTime);
+				role.wait(backOffTime);
 			} 
 			catch (InterruptedException e) {
 				// TODO Auto-generated catch block
