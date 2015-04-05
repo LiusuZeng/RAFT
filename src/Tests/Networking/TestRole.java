@@ -19,7 +19,7 @@ public class TestRole extends Role {
 	
 	/********SEND SERIES*******/
 	@Override
-	public void sendAppendMsg(int recvID, int prevTerm, int prevIndex, List<LogEntry> logToAppend)
+	public void sendAppendMsg(int recvID, int prevTerm, int prevIndex, ArrayList<LogEntry> logToAppend)
 	{
 		AppendMsg amsg = new AppendMsg(1, prevTerm, prevIndex, this.ID, 0, logToAppend);
 		this.comm.send(recvID, amsg);

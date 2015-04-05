@@ -15,11 +15,12 @@ public class Leader {
 	private Date timeStamp;
 	private int[] nextIndex; // next log index to send to that server
 	private int[] matchIndex; // highest matched index
-	
+
 	private List<Request> rqstList;
-	
+
 	public Leader(Role role) {
 		this.role = role;
+		//
 		timeStamp = new Date();
 		int numServer = Constants.numServer;
 		nextIndex = new int[numServer];
@@ -31,24 +32,19 @@ public class Leader {
 		matchIndex[role.ID] = role.getLastIndex();
 		rqstList = new ArrayList<Request>(); 
 	}
-	
+
 	public void setNextIndexByID(int ID, int index) {
 		nextIndex[ID] = index;
 		return;
 	}
-	
+
 	public void setMatchIndexByID(int ID, int index) {
 		assert(matchIndex[ID] <= index);
 		assert(matchIndex[ID] < nextIndex[ID]);
 		matchIndex[ID] = index;
 		return;
 	}
-	
-	public int getCommittedIndex() {
-		// equals to find median number;
-		return 0;
-	}
-	
+
 	private synchronized List<Request> getRequest() {
 		if(rqstList.isEmpty())
 			return null;
@@ -58,16 +54,15 @@ public class Leader {
 			return rqsts;
 		}
 	}
-	
+
 	public synchronized void putRequest(Request rqst) {
 		rqstList.add(rqst);
 	}
-	
+
 	public List<LogEntry> requestsToLogs(List<Request> requests) {
-		
 		return null;
 	} 
-	
+
 	public void heartbeat() {		
 		for(int index = 0; index < Constants.numServer; ++index) {
 			if(index != role.ID) {
@@ -76,7 +71,7 @@ public class Leader {
 			}
 		}		
 	}
-	
+
 	public int getCommitIndex(int[] matchIndex)
 	{
 		int length = matchIndex.length;
@@ -86,7 +81,7 @@ public class Leader {
 		assert(length%2 == 1);
 		return tmp[(length+1)/2];
 	}
-	
+
 	public void run() {
 		synchronized(role) {
 			while(role.getState() == State.Leader) {
@@ -103,20 +98,46 @@ public class Leader {
 				Date currentTime = new Date();
 				long timeRemaining = currentTime.getTime()-
 						timeStamp.getTime()-Constants.heartbeatRate;
-				if(timeRemaining <= 0) {
-					role.setCommitIndex(getCommitIndex(matchIndex));
-					heartbeat();
-					timeStamp = currentTime;
-				}
-				else {
+				// LZ: debug leader heartbeat timing
+				System.out.println("Calc remain time: " + timeRemaining);
+				//
+				//				if(timeRemaining <= 0) {
+				//					role.setCommitIndex(getCommitIndex(matchIndex));
+				//					heartbeat();
+				//					// LZ: debug leader heartbeat sending
+				//					System.out.println("Heartbeat sent!");
+				//					//
+				//					timeStamp = currentTime;
+				//				}
+				//				else {
+				//					try {
+				//						role.wait(timeRemaining);
+				//					} 
+				//					catch (InterruptedException e) {
+				//						// TODO Auto-generated catch block
+				//						e.printStackTrace();
+				//					}
+				//				}
+
+				if (timeRemaining < 0) {
 					try {
-						role.wait(timeRemaining);
+						role.wait(-1*timeRemaining);
 					} 
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					currentTime = new Date();
+					timeRemaining = currentTime.getTime()-
+							timeStamp.getTime()-Constants.heartbeatRate;
 				}
+				role.setCommitIndex(getCommitIndex(matchIndex));
+				heartbeat();
+				// LZ: debug leader heartbeat sending
+				System.out.println("Heartbeat sent!");
+				//
+				timeStamp = currentTime;
+
 			}
 		}
 	}

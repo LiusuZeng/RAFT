@@ -26,9 +26,9 @@ public class CommUtil {
 		}
 	}
 
-	public static List<LogEntry> recoverLogging(File src)
+	public static ArrayList<LogEntry> recoverLogging(File src)
 	{
-		List<LogEntry> ret = new ArrayList<LogEntry>(0);
+		ArrayList<LogEntry> ret = new ArrayList<LogEntry>(0);
 		try {
 			ArrayList<String> scripts = readByLine(src);
 			for(int i = 0; i < scripts.size(); i++)

@@ -1,6 +1,7 @@
 package Message;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppendMsg implements Serializable{
@@ -17,10 +18,10 @@ public class AppendMsg implements Serializable{
 	
 	private int commitedIndex;
 	
-	private List<LogEntry> logs;
+	private ArrayList<LogEntry> logs;
 	
 	public AppendMsg(int term, int prevTerm, int prevIndex, int leaderID,
-			int commitedIndex, List<LogEntry> logs) {
+			int commitedIndex, ArrayList<LogEntry> logs) {
 		super();
 		this.term = term;
 		this.leaderID = leaderID;

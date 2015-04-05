@@ -25,7 +25,7 @@ public class Role implements Runnable{
 	private int votedFor;
 	private int leaderID;
 
-	private List<LogEntry> logs;
+	private ArrayList<LogEntry> logs;
 
 	// volatile state
 	private int commitIndex; // materialized
@@ -114,11 +114,12 @@ public class Role implements Runnable{
 		if(index < logs.size())
 			return logs.get(index);
 		else
-			return null;
+			return logs.get(logs.size() - 1); // LZ: modified to check leader election
 	}
 
-	public synchronized List<LogEntry> getLogs(int startIndex) {
-		return logs.subList(startIndex, logs.size());
+	public synchronized ArrayList<LogEntry> getLogs(int startIndex) {
+		if(startIndex > logs.size()-1) return new ArrayList<LogEntry>(logs.subList(logs.size()-1, logs.size())); // LZ: modified to check leader election
+		else return new ArrayList<LogEntry>(logs.subList(startIndex, logs.size()));
 	}
 
 	public int getTerm () {
@@ -332,7 +333,7 @@ public class Role implements Runnable{
 	}
 
 	public synchronized void sendAppendMsg(int recvID, int prevTerm, int prevIndex, 
-			List<LogEntry> logToAppend) {
+			ArrayList<LogEntry> logToAppend) {
 		AppendMsg amsg = new AppendMsg(term, prevTerm, prevIndex, ID,
 				commitIndex, logToAppend);
 		// call COMM function to send

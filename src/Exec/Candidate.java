@@ -23,8 +23,10 @@ public class Candidate {
 	}
 	
 	private void init() {
-		this.numAccept = 0;
-		this.numReject = 0;	
+		// LZ: Vote for myself
+		this.numAccept = 1;
+		this.numReject = 0; // no need to reject itself
+		//
 		this.remainingTime = Constants.requestTimeout;
 	}
 		
@@ -62,12 +64,15 @@ public class Candidate {
 				
 				Date newDate = new Date();
 				remainingTime -= newDate.getTime()-oldDate.getTime();
-				
-				if(numAccept > Constants.numServer/2+1) {
+				// LZ: added to check leader election
+				System.out.println("Vote For: " + numAccept + "/" + (int)(Constants.numServer/2+1));
+				System.out.println("Vote against: " + numReject + "/" + (int)(Constants.numServer/2+1));
+				//
+				if(numAccept >= Constants.numServer/2+1) {
 					role.win();
 					return;
 				}
-				else if(numReject > Constants.numServer/2+1) {
+				else if(numReject >= Constants.numServer/2+1) {
 					role.lose();
 					return;
 				}
