@@ -33,7 +33,7 @@ public class Role implements Runnable{
 	public final Comm comm;
 
 	// other parameters
-	private boolean alive;
+	protected boolean alive;
 
 	public Role(int ID) throws IOException {
 		this.state = State.Follower;
@@ -115,6 +115,9 @@ public class Role implements Runnable{
 		return logs.subList(startIndex, logs.size());
 	}
 
+	public int getTerm () {
+		return term;
+	}
 	public int getVotedFor() {
 		return votedFor;
 	}
