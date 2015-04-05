@@ -9,7 +9,7 @@ public class Constants {
 	public static final long requestTimeout = 3000; // ms
 	
 	public static final long refreshRate = 1000;
-	public static final long heartbeatRate = 500; // origin: 1000
+	public static final long heartbeatRate = 1000; // origin: 1000
 	
 	public static final int numServer = 5; // total 5 server
 }

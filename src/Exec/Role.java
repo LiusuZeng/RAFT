@@ -118,7 +118,7 @@ public class Role implements Runnable{
 	}
 
 	public synchronized ArrayList<LogEntry> getLogs(int startIndex) {
-		if(startIndex > logs.size()-1) return new ArrayList<LogEntry>(logs.subList(logs.size()-1, logs.size())); // LZ: modified to check leader election
+		if(startIndex > logs.size()-1) return null; // LZ: modified to check leader election
 		else return new ArrayList<LogEntry>(logs.subList(startIndex, logs.size()));
 	}
 
@@ -152,7 +152,13 @@ public class Role implements Runnable{
 		if(msg == null)
 			return;
 		else if(msg instanceof AckAppendMsg) {
-			ackAppendMsgHandler((AckAppendMsg)msg);				
+			// LZ
+			System.out.println("I got AckAppend Msg!!!!");
+			//
+			ackAppendMsgHandler((AckAppendMsg)msg);
+			// LZ
+			System.out.println("Handler called for AckAppend Msg!!!!");
+			//
 		}
 		else if(msg instanceof AckVoteMsg) {
 			ackVoteMsgHandler((AckVoteMsg)msg);			
@@ -169,18 +175,30 @@ public class Role implements Runnable{
 	}
 
 	public synchronized void ackAppendMsgHandler(AckAppendMsg aamsg) {
+		// LZ
+		System.out.println("aamsg term: " + aamsg.getTerm() + " my term: " + term);
+		//
 		if(state != State.Leader) {
 			return;
 		}
 		int aaTerm = aamsg.getTerm();
 		if(aaTerm > term) {
+			// LZ
+			System.out.println("aaTerm > term");
+			//
 			state = State.Follower;
 			term = aaTerm;
 			votedFor = -1;
 			leaderID = aamsg.getLeaderID();
 		}
 		else if(aamsg.getTerm() == term) {
+			// LZ
+			System.out.println("aaTerm == term");
+			//
 			assert(aamsg.getLeaderID() == ID);
+			// LZ
+			System.out.println("Get res: " + aamsg.getSuccess());
+			//
 			if(aamsg.getSuccess()) {				
 				leader.setNextIndexByID(aamsg.getID(), 
 						aamsg.getLastIndex()+1);
@@ -195,6 +213,9 @@ public class Role implements Runnable{
 		}
 		else {
 			// just ignore
+			// LZ
+			System.out.println("aaTerm < term....");
+			//
 		}
 	}
 
@@ -250,6 +271,10 @@ public class Role implements Runnable{
 		}
 		// send back result to sender
 		sendAckAppendMsg(amsg.getLeaderID(), result);
+		if (!result) {
+			System.out.println("append Msg Handler returns:"+result);
+			System.out.println("asmg.log"+amsg.getLogs());
+		}
 	}
 
 	public synchronized void voteMsgHandler(VoteMsg vmsg) {
@@ -286,22 +311,31 @@ public class Role implements Runnable{
 		if(lastCommonIndex < logs.size()) {
 			if(logs.get(lastCommonIndex).getTerm() == lastCommonTerm) {
 				// first delete entries after aLastAppliedIndex
-				writeDeleteLogs(lastCommonIndex+1, logs.size());
-				logs.subList(lastCommonIndex+1, logs.size()).clear();				
-				// second appmsg logs from the amsg
-				logs.addAll(amsg.getLogs());
-				writeAppendLogs(lastCommonIndex+1, logs.size());
-				commitIndex = Math.min(logs.size()-1,  leaderCommittedIndex);
+				if(lastCommonIndex+1 < logs.size()) {
+					writeDeleteLogs(lastCommonIndex+1, logs.size());
+					logs.subList(lastCommonIndex+1, logs.size()).clear();
+					// second appmsg logs from the amsg
+					logs.addAll(amsg.getLogs());
+					writeAppendLogs(lastCommonIndex+1, logs.size());
+					commitIndex = Math.min(logs.size()-1,  leaderCommittedIndex);
+				}
 				// LZ
 				assert(appliedIndex <= commitIndex);
 				appliedIndex = commitIndex;
 				return true;
 			}
 			else {
+				if(lastCommonIndex == 0) {
+					System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
+					System.out.printf("lastCommonIndex Term : %d\n", logs.get(lastCommonIndex).getTerm());
+					System.out.printf("lastCommonTerm Term : %d\n", lastCommonTerm);
+				}
 				return false;
 			}
 		}
 		else {
+			System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
+			System.out.printf("Logs.size() : %d\n", logs.size());
 			return false;
 		}
 	}
@@ -337,7 +371,14 @@ public class Role implements Runnable{
 		AppendMsg amsg = new AppendMsg(term, prevTerm, prevIndex, ID,
 				commitIndex, logToAppend);
 		// call COMM function to send
+		
+		Date timeStop1 = new Date(); // LZ
+		
 		comm.send(recvID, amsg);
+		
+		Date timeStop2 = new Date(); 
+		System.out.println("[DEBUG] @@"+recvID+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+
 	}
 
 	public synchronized void sendVoteMsg(int recvID) {
@@ -349,6 +390,9 @@ public class Role implements Runnable{
 	}
 
 	public synchronized void sendAckAppendMsg(int recvID, boolean success) {
+		// LZ
+		System.out.println("I ack the append msg!!!!");
+		//
 		AckAppendMsg aamsg = 
 				new AckAppendMsg(leaderID, term, ID, success, logs.size()-1);
 		comm.send(recvID, aamsg);

@@ -66,8 +66,21 @@ public class Leader {
 	public void heartbeat() {		
 		for(int index = 0; index < Constants.numServer; ++index) {
 			if(index != role.ID) {
-				role.sendAppendMsg(index, role.getLog(nextIndex[index]).getTerm(), 
-						nextIndex[index], role.getLogs(nextIndex[index]));
+				// LZ
+				System.out.println("Check nextIndex:");
+				for(int i = 0; i < this.nextIndex.length; i++)
+				{
+					System.out.print(this.nextIndex[i] + " ");
+				}
+				System.out.println("Check end!");
+				//
+				Date timeStop1 = new Date(); // LZ
+				role.sendAppendMsg(index, role.getLog(nextIndex[index]-1).getTerm(), 
+						nextIndex[index]-1, role.getLogs(nextIndex[index]));
+				Date timeStop2 = new Date(); 
+				System.out.println("[DEBUG] @@"+index+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+				
+				
 			}
 		}		
 	}
@@ -88,7 +101,7 @@ public class Leader {
 				//
 				role.printDebug();
 				//
-				List<Request> rqsts = getRequest();
+				List<Request> rqsts = null; //getRequest();
 				if(rqsts != null) {
 					// convert request to log entry
 					List<LogEntry> logsToAppend = requestsToLogs(rqsts);
@@ -96,47 +109,59 @@ public class Leader {
 				}
 				// periodically send heart beat
 				Date currentTime = new Date();
-				long timeRemaining = currentTime.getTime()-
-						timeStamp.getTime()-Constants.heartbeatRate;
+				long timeRemaining = Constants.heartbeatRate-currentTime.getTime()+
+						timeStamp.getTime();
 				// LZ: debug leader heartbeat timing
 				System.out.println("Calc remain time: " + timeRemaining);
-				//
-				//				if(timeRemaining <= 0) {
-				//					role.setCommitIndex(getCommitIndex(matchIndex));
-				//					heartbeat();
-				//					// LZ: debug leader heartbeat sending
-				//					System.out.println("Heartbeat sent!");
-				//					//
-				//					timeStamp = currentTime;
-				//				}
-				//				else {
-				//					try {
-				//						role.wait(timeRemaining);
-				//					} 
-				//					catch (InterruptedException e) {
-				//						// TODO Auto-generated catch block
-				//						e.printStackTrace();
-				//					}
-				//				}
-
-				if (timeRemaining < 0) {
+				System.out.println("timestamp time: " + timeStamp.getTime());
+				System.out.println("current   time: " + currentTime.getTime());
+				if(timeRemaining <= 0) {
+					Date timeStop1 = new Date(); // LZ
+					role.setCommitIndex(getCommitIndex(matchIndex));
+					Date timeStop2 = new Date(); // LZ
+					heartbeat();
+					Date timeStop3 = new Date(); // LZ
+					System.out.println("[DEBUG] time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+					System.out.println("[DEBUG] time cost of heartbeat: " + (long)(timeStop3.getTime() - timeStop2.getTime()));
+					// LZ: debug leader heartbeat sending
+					System.out.println("Heartbeat sent!");
+					//
+					timeStamp = currentTime;
+				}
+				else {
 					try {
-						role.wait(-1*timeRemaining);
+						System.out.println("qnmlgb!!!");
+						role.wait(timeRemaining);
+						System.out.println("iܳ");
 					} 
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					currentTime = new Date();
-					timeRemaining = currentTime.getTime()-
-							timeStamp.getTime()-Constants.heartbeatRate;
 				}
-				role.setCommitIndex(getCommitIndex(matchIndex));
-				heartbeat();
-				// LZ: debug leader heartbeat sending
-				System.out.println("Heartbeat sent!");
-				//
-				timeStamp = currentTime;
+
+//				if (timeRemaining > 0) {
+//					System.out.println("cao ni ma!!!");
+//					try {
+//						System.out.println("qnmlgb!!!");
+//						role.wait(timeRemaining);
+//						System.out.println("iܳ");
+//					} 
+//					catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					System.out.println("he xie!!!");
+////					currentTime = new Date();
+////					timeRemaining = Constants.heartbeatRate-currentTime.getTime()+
+////							timeStamp.getTime();
+//				}
+//				role.setCommitIndex(getCommitIndex(matchIndex));
+//				heartbeat();
+//				// LZ: debug leader heartbeat sending
+//				System.out.println("Heartbeat sent!");
+//				//
+//				timeStamp = currentTime;
 
 			}
 		}
