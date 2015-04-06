@@ -153,11 +153,11 @@ public class Role implements Runnable{
 			return;
 		else if(msg instanceof AckAppendMsg) {
 			// LZ
-			System.out.println("I got AckAppend Msg!!!!");
+			//System.out.println("I got AckAppend Msg!!!!");
 			//
 			ackAppendMsgHandler((AckAppendMsg)msg);
 			// LZ
-			System.out.println("Handler called for AckAppend Msg!!!!");
+			//System.out.println("Handler called for AckAppend Msg!!!!");
 			//
 		}
 		else if(msg instanceof AckVoteMsg) {
@@ -176,7 +176,7 @@ public class Role implements Runnable{
 
 	public synchronized void ackAppendMsgHandler(AckAppendMsg aamsg) {
 		// LZ
-		System.out.println("aamsg term: " + aamsg.getTerm() + " my term: " + term);
+		//System.out.println("aamsg term: " + aamsg.getTerm() + " my term: " + term);
 		//
 		if(state != State.Leader) {
 			return;
@@ -184,7 +184,7 @@ public class Role implements Runnable{
 		int aaTerm = aamsg.getTerm();
 		if(aaTerm > term) {
 			// LZ
-			System.out.println("aaTerm > term");
+			//System.out.println("aaTerm > term");
 			//
 			state = State.Follower;
 			term = aaTerm;
@@ -193,11 +193,11 @@ public class Role implements Runnable{
 		}
 		else if(aamsg.getTerm() == term) {
 			// LZ
-			System.out.println("aaTerm == term");
+			//System.out.println("aaTerm == term");
 			//
 			assert(aamsg.getLeaderID() == ID);
 			// LZ
-			System.out.println("Get res: " + aamsg.getSuccess());
+			//System.out.println("Get res: " + aamsg.getSuccess());
 			//
 			if(aamsg.getSuccess()) {				
 				leader.setNextIndexByID(aamsg.getID(), 
@@ -214,7 +214,7 @@ public class Role implements Runnable{
 		else {
 			// just ignore
 			// LZ
-			System.out.println("aaTerm < term....");
+			//System.out.println("aaTerm < term....");
 			//
 		}
 	}
@@ -326,16 +326,16 @@ public class Role implements Runnable{
 			}
 			else {
 				if(lastCommonIndex == 0) {
-					System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
-					System.out.printf("lastCommonIndex Term : %d\n", logs.get(lastCommonIndex).getTerm());
-					System.out.printf("lastCommonTerm Term : %d\n", lastCommonTerm);
+					//System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
+					//System.out.printf("lastCommonIndex Term : %d\n", logs.get(lastCommonIndex).getTerm());
+					//System.out.printf("lastCommonTerm Term : %d\n", lastCommonTerm);
 				}
 				return false;
 			}
 		}
 		else {
-			System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
-			System.out.printf("Logs.size() : %d\n", logs.size());
+			//System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
+			//System.out.printf("Logs.size() : %d\n", logs.size());
 			return false;
 		}
 	}
@@ -372,12 +372,12 @@ public class Role implements Runnable{
 				commitIndex, logToAppend);
 		// call COMM function to send
 		
-		Date timeStop1 = new Date(); // LZ
+		//Date timeStop1 = new Date(); // LZ
 		
 		comm.send(recvID, amsg);
 		
-		Date timeStop2 = new Date(); 
-		System.out.println("[DEBUG] @@"+recvID+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+		//Date timeStop2 = new Date(); 
+		//System.out.println("[DEBUG] @@"+recvID+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
 
 	}
 
@@ -391,7 +391,7 @@ public class Role implements Runnable{
 
 	public synchronized void sendAckAppendMsg(int recvID, boolean success) {
 		// LZ
-		System.out.println("I ack the append msg!!!!");
+		//System.out.println("I ack the append msg!!!!");
 		//
 		AckAppendMsg aamsg = 
 				new AckAppendMsg(leaderID, term, ID, success, logs.size()-1);
@@ -411,7 +411,8 @@ public class Role implements Runnable{
 		System.out.println("State: " + this.getState());
 		System.out.println("Term: " + this.getTerm());
 		System.out.println("Last Index: " + this.getLastIndex());
-		System.out.println("Voted for: " + this.getVotedFor() + "\n");
+		System.out.println("Voted for: " + this.getVotedFor());
+		System.out.println("Leader: " + this.leaderID + "\n");
 
 	}
 }

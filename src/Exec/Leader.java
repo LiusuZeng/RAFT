@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import Constants.Constants;
 import Message.LogEntry;
@@ -18,6 +19,9 @@ public class Leader {
 
 	private List<Request> rqstList;
 
+	//private int chance = 0; // LZ: chance > 50, sleep 10 sec
+	//private boolean con = true;
+
 	public Leader(Role role) {
 		this.role = role;
 		//
@@ -30,7 +34,10 @@ public class Leader {
 			nextIndex[ID] = role.getLastIndex()+1;
 		}
 		matchIndex[role.ID] = role.getLastIndex();
-		rqstList = new ArrayList<Request>(); 
+		rqstList = new ArrayList<Request>();
+		// LZ: chance
+		//Random seed = new Random();
+		//chance = seed.nextInt(100);
 	}
 
 	public void setNextIndexByID(int ID, int index) {
@@ -79,8 +86,8 @@ public class Leader {
 						nextIndex[index]-1, role.getLogs(nextIndex[index]));
 				Date timeStop2 = new Date(); 
 				System.out.println("[DEBUG] @@"+index+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
-				
-				
+
+
 			}
 		}		
 	}
@@ -100,6 +107,18 @@ public class Leader {
 			while(role.getState() == State.Leader) {
 				//
 				role.printDebug();
+				// LZ: if great chance, sleep
+				/*
+				if(con && chance > 50)
+					System.out.println("Going 2 sleep!");
+				con = false;
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				*/
 				//
 				List<Request> rqsts = null; //getRequest();
 				if(rqsts != null) {
@@ -112,17 +131,19 @@ public class Leader {
 				long timeRemaining = Constants.heartbeatRate-currentTime.getTime()+
 						timeStamp.getTime();
 				// LZ: debug leader heartbeat timing
+				/*
 				System.out.println("Calc remain time: " + timeRemaining);
 				System.out.println("timestamp time: " + timeStamp.getTime());
 				System.out.println("current   time: " + currentTime.getTime());
+				 */
 				if(timeRemaining <= 0) {
-					Date timeStop1 = new Date(); // LZ
+					//Date timeStop1 = new Date(); // LZ
 					role.setCommitIndex(getCommitIndex(matchIndex));
-					Date timeStop2 = new Date(); // LZ
+					//Date timeStop2 = new Date(); // LZ
 					heartbeat();
-					Date timeStop3 = new Date(); // LZ
-					System.out.println("[DEBUG] time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
-					System.out.println("[DEBUG] time cost of heartbeat: " + (long)(timeStop3.getTime() - timeStop2.getTime()));
+					//Date timeStop3 = new Date(); // LZ
+					//System.out.println("[DEBUG] time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+					//System.out.println("[DEBUG] time cost of heartbeat: " + (long)(timeStop3.getTime() - timeStop2.getTime()));
 					// LZ: debug leader heartbeat sending
 					System.out.println("Heartbeat sent!");
 					//
@@ -130,38 +151,15 @@ public class Leader {
 				}
 				else {
 					try {
-						System.out.println("qnmlgb!!!");
+						//System.out.println("qnmlgb!!!");
 						role.wait(timeRemaining);
-						System.out.println("iܳ");
+						//System.out.println("iܳ");
 					} 
 					catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-
-//				if (timeRemaining > 0) {
-//					System.out.println("cao ni ma!!!");
-//					try {
-//						System.out.println("qnmlgb!!!");
-//						role.wait(timeRemaining);
-//						System.out.println("iܳ");
-//					} 
-//					catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					System.out.println("he xie!!!");
-////					currentTime = new Date();
-////					timeRemaining = Constants.heartbeatRate-currentTime.getTime()+
-////							timeStamp.getTime();
-//				}
-//				role.setCommitIndex(getCommitIndex(matchIndex));
-//				heartbeat();
-//				// LZ: debug leader heartbeat sending
-//				System.out.println("Heartbeat sent!");
-//				//
-//				timeStamp = currentTime;
 
 			}
 		}
