@@ -247,6 +247,7 @@ public class Role implements Runnable{
 		boolean result = false;
 		if(aTerm > term)
 		{
+			System.out.println("aTerm > term");
 			state = State.Follower;	
 			term = aTerm;
 			votedFor = -1;
@@ -257,6 +258,7 @@ public class Role implements Runnable{
 			result = appendLogs(amsg);			
 		}
 		else if(aTerm == term) {
+			System.out.println("aTerm = term");
 			assert(state != State.Leader);			
 			if(leaderID == -1)
 			{
@@ -309,23 +311,29 @@ public class Role implements Runnable{
 		int lastCommonIndex = amsg.getPrevIndex();
 		int leaderCommittedIndex = amsg.getCommitedIndex();
 		if(lastCommonIndex < logs.size()) {
+			System.out.println("lastCommonIndex < logs.size()");
 			if(logs.get(lastCommonIndex).getTerm() == lastCommonTerm) {
 				// first delete entries after aLastAppliedIndex
 				if(lastCommonIndex+1 < logs.size()) {
+					// see if need to delete
 					writeDeleteLogs(lastCommonIndex+1, logs.size());
 					logs.subList(lastCommonIndex+1, logs.size()).clear();
+				}
+				if(amsg.getLogs() != null) {
 					// second appmsg logs from the amsg
 					logs.addAll(amsg.getLogs());
 					writeAppendLogs(lastCommonIndex+1, logs.size());
-					commitIndex = Math.min(logs.size()-1,  leaderCommittedIndex);
 				}
+				commitIndex = Math.min(logs.size()-1,  leaderCommittedIndex);
 				// LZ
 				assert(appliedIndex <= commitIndex);
 				appliedIndex = commitIndex;
 				return true;
 			}
 			else {
+				System.out.println("lastCommonIndex >= logs.size()");
 				if(lastCommonIndex == 0) {
+					System.out.println("lastCommonIndex == 0");
 					//System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
 					//System.out.printf("lastCommonIndex Term : %d\n", logs.get(lastCommonIndex).getTerm());
 					//System.out.printf("lastCommonTerm Term : %d\n", lastCommonTerm);
@@ -353,16 +361,19 @@ public class Role implements Runnable{
 	}
 
 	public synchronized void writeDeleteLogs(int startIndex, int endIndex) {
-
+		System.out.println("I am writing to delete log..."); // LZ
 		logFile.printf("DELETE IndexFrom: %d, IndexUntil: %d\n", 
-				startIndex, endIndex-1);	
+				startIndex, endIndex-1);
+		logFile.flush();
 		return;
 	}
 
 	public synchronized void writeAppendLogs(int startIndex, int endIndex) {
+		System.out.println("I am writing to add log..."); //LZ
 		for(int i = startIndex; i < endIndex; ++i)
 			logFile.printf("APPEND Term: %d, Index: %d, Value: %d\n", 
-					term, i, logs.get(i).getIns().getValue());	
+					term, i, logs.get(i).getIns().getValue());
+		logFile.flush();
 		return;
 	}
 

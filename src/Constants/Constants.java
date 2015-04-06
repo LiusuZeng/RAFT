@@ -12,4 +12,7 @@ public class Constants {
 	public static final long heartbeatRate = 1000; // origin: 1000
 	
 	public static final int numServer = 5; // total 5 server
+	
+	//CX
+	public static final int appendFrequency = 5;
 }

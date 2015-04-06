@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import Constants.Constants;
+import Message.Instruction;
 import Message.LogEntry;
 import Message.Request;
 
@@ -18,7 +19,11 @@ public class Leader {
 	private int[] matchIndex; // highest matched index
 
 	private List<Request> rqstList;
-
+	
+	//CX
+	private int appendFrequency = Constants.appendFrequency;
+	
+	
 	//private int chance = 0; // LZ: chance > 50, sleep 10 sec
 	//private boolean con = true;
 
@@ -70,7 +75,8 @@ public class Leader {
 		return null;
 	} 
 
-	public void heartbeat() {		
+	public void heartbeat() {
+
 		for(int index = 0; index < Constants.numServer; ++index) {
 			if(index != role.ID) {
 				// LZ
@@ -84,6 +90,8 @@ public class Leader {
 				Date timeStop1 = new Date(); // LZ
 				role.sendAppendMsg(index, role.getLog(nextIndex[index]-1).getTerm(), 
 						nextIndex[index]-1, role.getLogs(nextIndex[index]));
+				System.out.println("nextIndex[index]="+nextIndex[index]+" role.getLogs="+role.getLogs(nextIndex[index]));
+				
 				Date timeStop2 = new Date(); 
 				System.out.println("[DEBUG] @@"+index+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
 
@@ -91,7 +99,32 @@ public class Leader {
 			}
 		}		
 	}
-
+	
+//	//CX
+//	public void appendRealLog() {
+//
+//		for(int index = 0; index < Constants.numServer; ++index) {
+//			if(index != role.ID) {
+//				// LZ
+//				System.out.println("Check nextIndex:");
+//				for(int i = 0; i < this.nextIndex.length; i++)
+//				{
+//					System.out.print(this.nextIndex[i] + " ");
+//				}
+//				System.out.println("Check end!");
+//				//
+//				Date timeStop1 = new Date(); // LZ
+//				role.sendAppendMsg(index, role.getLog(nextIndex[index]).getTerm(), 
+//						nextIndex[index], role.getLogs(nextIndex[index]));
+//				Date timeStop2 = new Date(); 
+//				System.out.println("[DEBUG] @@"+index+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+//
+//
+//			}
+//		}		
+//	}
+//	//
+	
 	public int getCommitIndex(int[] matchIndex)
 	{
 		int length = matchIndex.length;
@@ -140,7 +173,28 @@ public class Leader {
 					//Date timeStop1 = new Date(); // LZ
 					role.setCommitIndex(getCommitIndex(matchIndex));
 					//Date timeStop2 = new Date(); // LZ
+					
+					//CX
+					if (appendFrequency <= 0) {
+						// append to leader itself
+						Random random = new Random();
+						LogEntry newentry = new LogEntry(this.role.getTerm(), this.role.getLastIndex()+1, new Instruction(random.nextInt(100)));
+						List<LogEntry> newlist = new ArrayList<LogEntry>();
+						newlist.add(newentry);
+						this.role.appendLogs(newlist);
+						appendFrequency = Constants.appendFrequency;
+						//appendRealLog();
+						
+					}
+					else {
+						appendFrequency--;
+						
+					}
+					//
+					
 					heartbeat();
+					
+					//heartbeat();
 					//Date timeStop3 = new Date(); // LZ
 					//System.out.println("[DEBUG] time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
 					//System.out.println("[DEBUG] time cost of heartbeat: " + (long)(timeStop3.getTime() - timeStop2.getTime()));
