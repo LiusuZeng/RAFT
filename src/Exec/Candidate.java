@@ -74,7 +74,7 @@ public class Candidate {
 				}
 				else if(numReject >= Constants.numServer/2+1) {
 					role.lose();
-					return;
+					// should continue waiting until an leader conmes into power or reelect.
 				}
 			}
 			// backoff a randomized time		
