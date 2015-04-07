@@ -43,13 +43,13 @@ public class StressTest {
 		group[sel].pause();
 		//
 		System.out.println("Stress Test Thread waits for the rest to have a new leader and modify their logs (5s)...");
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 		//
 		System.out.println("Now resume the initial leader...");
 		group[sel].resume();
 		//
 		System.out.println("Wait for syc (10s)...");
-		Thread.sleep(10000);
+		Thread.sleep(5000);
 		// Find the leader again
 		int sel2 = -1;
 		while(true)
@@ -70,6 +70,7 @@ public class StressTest {
 		for(int i = 0; i < group.length; i++)
 		{
 			myThr[i].stop();
+			group[i].terminator();
 		}
 		Thread.sleep(5000);
 		//
