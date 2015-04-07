@@ -1,4 +1,5 @@
-/Constants
-/Exec
-/test
-/Comm
+/Comm/
+/Constants/
+/Exec/
+/Message/
+/Tests/

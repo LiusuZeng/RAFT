@@ -1,19 +1,19 @@
-APPEND Term: 1, Index: 1, Value: 57, Leader: 1
-APPEND Term: 1, Index: 2, Value: 12, Leader: 1
-APPEND Term: 1, Index: 3, Value: 22, Leader: 1
-DELETE IndexFrom: 3, IndexUntil: 3, Leader: 1
-APPEND Term: 1, Index: 3, Value: 22, Leader: 1
-DELETE IndexFrom: 3, IndexUntil: 3, Leader: 1
-APPEND Term: 1, Index: 3, Value: 22, Leader: 1
-APPEND Term: 1, Index: 4, Value: 78, Leader: 1
-DELETE IndexFrom: 3, IndexUntil: 4, Leader: 1
-APPEND Term: 1, Index: 3, Value: 22, Leader: 1
-APPEND Term: 1, Index: 4, Value: 78, Leader: 1
-DELETE IndexFrom: 3, IndexUntil: 4, Leader: 1
-APPEND Term: 1, Index: 3, Value: 22, Leader: 1
-APPEND Term: 1, Index: 4, Value: 78, Leader: 1
-APPEND Term: 1, Index: 5, Value: 29, Leader: 1
-APPEND Term: 1, Index: 6, Value: 98, Leader: 1
-APPEND Term: 1, Index: 7, Value: 84, Leader: 1
-APPEND Term: 1, Index: 8, Value: 42, Leader: 1
-APPEND Term: 1, Index: 9, Value: 61, Leader: 1
+APPEND Term: 1, Index: 1, Value: 34, Leader: 2
+APPEND Term: 1, Index: 2, Value: 45, Leader: 2
+APPEND Term: 1, Index: 3, Value: 9, Leader: 2
+DELETE IndexFrom: 3, IndexUntil: 4, Leader: 2
+APPEND Term: 1, Index: 3, Value: 9, Leader: 2
+DELETE IndexFrom: 3, IndexUntil: 4, Leader: 2
+APPEND Term: 1, Index: 3, Value: 9, Leader: 2
+APPEND Term: 1, Index: 4, Value: 74, Leader: 2
+DELETE IndexFrom: 3, IndexUntil: 5, Leader: 2
+APPEND Term: 1, Index: 3, Value: 9, Leader: 2
+APPEND Term: 1, Index: 4, Value: 74, Leader: 2
+DELETE IndexFrom: 3, IndexUntil: 5, Leader: 2
+APPEND Term: 1, Index: 3, Value: 9, Leader: 2
+APPEND Term: 1, Index: 4, Value: 74, Leader: 2
+APPEND Term: 1, Index: 5, Value: 80, Leader: 2
+APPEND Term: 1, Index: 6, Value: 37, Leader: 2
+APPEND Term: 1, Index: 7, Value: 93, Leader: 2
+APPEND Term: 1, Index: 8, Value: 33, Leader: 2
+APPEND Term: 1, Index: 9, Value: 44, Leader: 2
