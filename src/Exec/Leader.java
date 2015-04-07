@@ -134,12 +134,24 @@ public class Leader {
 		assert(length%2 == 1);
 		return tmp[(length+1)/2];
 	}
+	
+	// Lz
+	public void printfMatchIndex()
+	{
+		for(int i = 0; i < this.matchIndex.length; i++)
+		{
+			System.out.print("Val at pos " + i + ": " + this.matchIndex[i] + "\t");
+		}
+		System.out.println("");
+	}
+	//
 
 	public void run() {
 		synchronized(role) {
 			while(role.getState() == State.Leader) {
 				//
 				role.printDebug();
+				matchIndex[role.ID] = role.getLastIndex();
 				// LZ: if great chance, sleep
 				/*
 				if(con && chance > 50)

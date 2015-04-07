@@ -83,7 +83,7 @@ public class Comm implements Runnable {
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.out.println("Machine " + this.role.ID + " resources retrieved!");
 			return;
 		}

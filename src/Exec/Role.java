@@ -31,7 +31,7 @@ public class Role implements Runnable{
 	private int commitIndex; // materialized
 	private int appliedIndex; // already applied, in memory
 
-	public final Comm comm;
+	public Comm comm;
 
 	// other parameters
 	protected boolean alive;
@@ -64,7 +64,30 @@ public class Role implements Runnable{
 			this.logs.add(new LogEntry(0, 0, new Instruction(0)));
 		}
 	}
-
+	
+	// LZ
+	public void pause()
+	{
+		this.comm.Terminator();
+	}
+	
+	public void resume()
+	{
+		this.comm = new Comm(this);
+	}
+	
+	public void terminator()
+	{
+		this.comm.Terminator();
+		this.alive = false;
+	}
+	
+	public Leader getLeaderInst()
+	{
+		return this.leader;
+	}
+	//
+	
 	public void run() {
 		// TODO Auto-generated method stub
 		while(isAlive()) {
@@ -118,8 +141,10 @@ public class Role implements Runnable{
 	}
 
 	public synchronized ArrayList<LogEntry> getLogs(int startIndex) {
-		if(startIndex > logs.size()-1) return null; // LZ: modified to check leader election
-		else return new ArrayList<LogEntry>(logs.subList(startIndex, logs.size()));
+		if(startIndex > logs.size()-1) 
+			return null; // LZ: modified to check leader election
+		else 
+			return new ArrayList<LogEntry>(logs.subList(startIndex, logs.size()));
 	}
 
 	public int getTerm () {
@@ -131,6 +156,7 @@ public class Role implements Runnable{
 
 	public synchronized void win() {
 		state = State.Leader;
+		leaderID = ID;
 	}
 
 	public synchronized void lose() {
@@ -285,8 +311,16 @@ public class Role implements Runnable{
 		if(voteTerm > term) {
 			int vLastTerm = vmsg.getLastAppliedTerm();
 			int vLastIndex = vmsg.getLastAppliedIndex();
-			if(vLastTerm >= logs.get(logs.size()-1).getTerm() && 
-					vLastIndex >= logs.size()-1) {
+			if(vLastTerm < logs.get(logs.size()-1).getTerm()) {
+				// do nothing
+			}
+			else if(vLastTerm == logs.get(logs.size()-1).getTerm() && 
+					vLastIndex < logs.size()-1) {
+				// do nothing
+			}
+//			else if(vLastTerm >= logs.get(logs.size()-1).getTerm() && 
+//					vLastIndex >= logs.size()-1) {
+			else {
 				state = State.Follower;
 				term = voteTerm;
 				leaderID = -1;
@@ -362,8 +396,8 @@ public class Role implements Runnable{
 
 	public synchronized void writeDeleteLogs(int startIndex, int endIndex) {
 		System.out.println("I am writing to delete log..."); // LZ
-		logFile.printf("DELETE IndexFrom: %d, IndexUntil: %d\n", 
-				startIndex, endIndex-1);
+		logFile.printf("DELETE IndexFrom: %d, IndexUntil: %d, Leader: %d\n", 
+				startIndex, endIndex-1, leaderID);
 		logFile.flush();
 		return;
 	}
@@ -371,8 +405,8 @@ public class Role implements Runnable{
 	public synchronized void writeAppendLogs(int startIndex, int endIndex) {
 		System.out.println("I am writing to add log..."); //LZ
 		for(int i = startIndex; i < endIndex; ++i)
-			logFile.printf("APPEND Term: %d, Index: %d, Value: %d\n", 
-					term, i, logs.get(i).getIns().getValue());
+			logFile.printf("APPEND Term: %d, Index: %d, Value: %d, Leader: %d\n", 
+					logs.get(i).getTerm(), i, logs.get(i).getIns().getValue(), leaderID);
 		logFile.flush();
 		return;
 	}
