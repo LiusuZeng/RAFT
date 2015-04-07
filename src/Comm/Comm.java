@@ -14,6 +14,7 @@ public class Comm implements Runnable {
 	private String motherIP;
 	private int motherPort;
 	private ServerSocket mother;
+	private boolean alive; // edited by eclipce
 
 	public Comm(Role src_role) {
 		// Load configuration info...
@@ -24,19 +25,35 @@ public class Comm implements Runnable {
 		this.motherIP = this.sysConfig.get(this.role.ID).getEntryIP();
 		this.motherPort = this.sysConfig.get(this.role.ID).getEntryPort();
 		this.mother = null;
+		
+		this.alive = true; // edited by eclipce
+		
 		// Start ManagerThr
 		Thread ManagerThr = new Thread(this);
 		ManagerThr.start();
 	}
 
 	public void send(int recvID, Object obj) {
+		
+		// edited by eclipce
+		if(!alive)
+			return;
+		// edited by eclipce
+		
 		Date timeStop1 = new Date();
 		//
 		try {
-			String tar_ip = this.sysConfig.get(recvID).getEntryIP();
-			int tar_port = this.sysConfig.get(recvID).getEntryPort();
-			Socket tell = new Socket();
-			tell.connect(new InetSocketAddress(tar_ip, tar_port), 50); // set failed max time cost to be 50 ms
+			// edited by eclipce
+			Socket tell = sysConfig.get(recvID).getSocket();
+			if(tell == null)
+				return;
+			// edited by eclipce
+			
+//			String tar_ip = this.sysConfig.get(recvID).getEntryIP();
+//			int tar_port = this.sysConfig.get(recvID).getEntryPort();
+//			Socket tell = new Socket();
+//			tell.connect(new InetSocketAddress(tar_ip, tar_port), 50); // set failed max time cost to be 50 ms
+
 			ObjectOutputStream oos = new ObjectOutputStream(tell.getOutputStream());
 			oos.writeObject(obj);
 			oos.flush();
@@ -56,10 +73,20 @@ public class Comm implements Runnable {
 	{
 		try {
 			this.mother.close();
-		} catch (IOException e) {
+			
+			// edited by eclipce
+			if(sysConfig != null) {
+				
+			}	
+			// edited by eclipce			
+		} 
+		catch (IOException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 			System.out.println("Resources already retrieved!");
+		}
+		finally {
+			alive = false;
 		}
 	}
 
@@ -69,9 +96,23 @@ public class Comm implements Runnable {
 			this.mother = new ServerSocket(this.motherPort);
 			Object msg = null;
 			//
-			while(true)
+			while(alive)
 			{
 				Socket son = this.mother.accept();
+				
+				// edited by eclipce
+//				InetSocketAddress who = (InetSocketAddress) son.getRemoteSocketAddress();
+//				CommInfo me = sysConfig.get(who);
+//				if(me == null) {
+//					System.out.printf("receiving connection request from unknow IP: %s, Port: %d\n",
+//							who.getAddress().toString(), who.getPort());
+//					// do nothing
+//				}
+//				else {
+//					me.setSocket(son);
+//				}
+				// edited by eclipce
+				
 				// get para
 				ObjectInputStream ois = new ObjectInputStream(son.getInputStream());
 				msg = ois.readObject();
