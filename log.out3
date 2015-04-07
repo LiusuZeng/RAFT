@@ -1,0 +1,8 @@
+APPEND Term: 1, Index: 1, Value: 82, Leader: 2
+APPEND Term: 1, Index: 2, Value: 90, Leader: 2
+APPEND Term: 1, Index: 3, Value: 35, Leader: 2
+APPEND Term: 1, Index: 4, Value: 80, Leader: 2
+APPEND Term: 1, Index: 5, Value: 27, Leader: 2
+APPEND Term: 1, Index: 6, Value: 0, Leader: 2
+APPEND Term: 2, Index: 7, Value: 2, Leader: 4
+APPEND Term: 2, Index: 8, Value: 48, Leader: 4

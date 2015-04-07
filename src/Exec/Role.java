@@ -1,6 +1,7 @@
 package Exec;
 
 import java.io.*;
+import java.net.SocketException;
 import java.util.*;
 
 import Comm.Comm;
@@ -71,7 +72,7 @@ public class Role implements Runnable{
 		this.comm.Terminator();
 	}
 	
-	public void resume()
+	public void resume() throws SocketException
 	{
 		this.comm = new Comm(this);
 	}
@@ -197,6 +198,7 @@ public class Role implements Runnable{
 		}
 		else {
 			// just ignore
+			System.out.printf("i ++,  what the ** is this!\n");
 		}
 	}
 

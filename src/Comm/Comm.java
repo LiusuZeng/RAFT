@@ -1,11 +1,21 @@
 package Comm;
 
-import java.util.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.util.Date;
+import java.util.HashMap;
 
-import Exec.*;
-
-import java.net.*;
+import Constants.Constants;
+import Exec.Role;
 
 public class Comm implements Runnable {
 
@@ -13,20 +23,23 @@ public class Comm implements Runnable {
 	private Role role;
 	private String motherIP;
 	private int motherPort;
-	private ServerSocket mother;
 	private boolean alive; // edited by eclipce
+	// LZ: server UDP
+	private DatagramSocket server;
 
-	public Comm(Role src_role) {
+	public Comm(Role src_role) throws SocketException {
 		// Load configuration info...
-		File file = new File(Constants.Constants.confFile);
+		File file = new File(Constants.confFile);
 		this.sysConfig = CommUtil.parse(file);
 		// get op obj
 		this.role = src_role;
 		this.motherIP = this.sysConfig.get(this.role.ID).getEntryIP();
 		this.motherPort = this.sysConfig.get(this.role.ID).getEntryPort();
-		this.mother = null;
 		
 		this.alive = true; // edited by eclipce
+		
+		// LZ: client UDP
+		this.server = new DatagramSocket(this.motherPort);
 		
 		// Start ManagerThr
 		Thread ManagerThr = new Thread(this);
@@ -44,19 +57,25 @@ public class Comm implements Runnable {
 		//
 		try {
 			// edited by eclipce
-			Socket tell = sysConfig.get(recvID).getSocket();
-			if(tell == null)
-				return;
+			InetSocketAddress addr = sysConfig.get(recvID).getSocketAddress();
+			System.out.println("###############send des: " + addr.toString());
+			assert(addr != null);
 			// edited by eclipce
 			
-//			String tar_ip = this.sysConfig.get(recvID).getEntryIP();
-//			int tar_port = this.sysConfig.get(recvID).getEntryPort();
-//			Socket tell = new Socket();
-//			tell.connect(new InetSocketAddress(tar_ip, tar_port), 50); // set failed max time cost to be 50 ms
-
-			ObjectOutputStream oos = new ObjectOutputStream(tell.getOutputStream());
+			// LZ: Change networking communication to UDP
+			ByteArrayOutputStream raw = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(raw);
 			oos.writeObject(obj);
-			oos.flush();
+			byte[] data_pack = raw.toByteArray();
+			//
+			System.out.println("******************data packet size: " + data_pack.length);
+			//
+			raw.close();
+			oos.close();
+			// LZ: get send addr info and construct UDP packet
+			DatagramPacket toBsent = new DatagramPacket(data_pack, data_pack.length, addr);
+			this.server.send(toBsent);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
@@ -72,18 +91,12 @@ public class Comm implements Runnable {
 	public void Terminator()
 	{
 		try {
-			this.mother.close();
-			
+			this.server.close();
 			// edited by eclipce
 			if(sysConfig != null) {
 				
 			}	
 			// edited by eclipce			
-		} 
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			System.out.println("Resources already retrieved!");
 		}
 		finally {
 			alive = false;
@@ -93,34 +106,30 @@ public class Comm implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			this.mother = new ServerSocket(this.motherPort);
+			byte[] buffer = new byte[Constants.udpBufferSize];
+			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 			Object msg = null;
 			//
 			while(alive)
 			{
-				Socket son = this.mother.accept();
-				
-				// edited by eclipce
-//				InetSocketAddress who = (InetSocketAddress) son.getRemoteSocketAddress();
-//				CommInfo me = sysConfig.get(who);
-//				if(me == null) {
-//					System.out.printf("receiving connection request from unknow IP: %s, Port: %d\n",
-//							who.getAddress().toString(), who.getPort());
-//					// do nothing
-//				}
-//				else {
-//					me.setSocket(son);
-//				}
-				// edited by eclipce
-				
-				// get para
-				ObjectInputStream ois = new ObjectInputStream(son.getInputStream());
+				System.out.println("In while!!!!!!!");
+				// LZ: accept UDP packet
+				this.server.receive(packet);
+				System.out.println("I recv packet! " + this.role.ID);
+				// LZ: notify mallicious attack
+				/*
+				SocketAddress recv_addr = packet.getSocketAddress();
+				assert(this.sysConfig.containsValue());
+				*/
+				// LZ: reconstruct obj
+				byte[] raw = packet.getData();
+				assert(raw != null);
+				assert(raw.length != 0);
+				ByteArrayInputStream bi = new ByteArrayInputStream(raw);
+				ObjectInputStream ois = new ObjectInputStream(bi);
 				msg = ois.readObject();
-				//
-				CommProcessThr Employee = new CommProcessThr(msg, this.role);
-				Employee.start();
-				//
-				ois.close();
+				// LZ: call recv
+				this.role.recvMsg(msg);
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block

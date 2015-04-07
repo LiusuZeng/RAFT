@@ -15,4 +15,6 @@ public class Constants {
 	
 	//CX
 	public static final int appendFrequency = 1;
+	// LZ
+	public static final int udpBufferSize = 65536;
 }
