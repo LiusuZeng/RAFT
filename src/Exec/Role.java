@@ -198,7 +198,7 @@ public class Role implements Runnable{
 		}
 		else {
 			// just ignore
-			System.out.printf("i ++,  what the ** is this!\n");
+			//System.out.printf("i ++,  what the ** is this!\n");
 		}
 	}
 
@@ -221,14 +221,14 @@ public class Role implements Runnable{
 		}
 		else if(aamsg.getTerm() == term) {
 			// LZ
-			System.out.printf("sender id %d, sender's leader: %d", aamsg.getID(), aamsg.getLeaderID());;
-			System.out.println("===================================== == term");
+			//System.out.printf("sender id %d, sender's leader: %d", aamsg.getID(), aamsg.getLeaderID());;
+			//System.out.println("===================================== == term");
 			//
 			assert(aamsg.getLeaderID() == ID);
 			// LZ
-			System.out.println("--------Get append res from id %d\n: " + aamsg.getID());
-			System.out.printf("---------Get append res success: ", aamsg.getSuccess()+"\n");
-			System.out.printf("---------Get append res common index %d: \n", aamsg.getLastIndex());
+			//System.out.println("--------Get append res from id %d\n: " + aamsg.getID());
+			//System.out.printf("---------Get append res success: ", aamsg.getSuccess()+"\n");
+			//System.out.printf("---------Get append res common index %d: \n", aamsg.getLastIndex());
 			//
 			if(aamsg.getSuccess()) {				
 				leader.setNextIndexByID(aamsg.getID(), 
@@ -278,7 +278,7 @@ public class Role implements Runnable{
 		boolean result = false;
 		if(aTerm > term)
 		{
-			System.out.println("aTerm > term");
+			//System.out.println("aTerm > term");
 			state = State.Follower;	
 			term = aTerm;
 			votedFor = -1;
@@ -289,11 +289,11 @@ public class Role implements Runnable{
 			result = appendLogs(amsg);			
 		}
 		else if(aTerm == term) {
-			System.out.println("aTerm = term");
+			//System.out.println("aTerm = term");
 			assert(state != State.Leader);			
 			if(leaderID == -1)
 			{
-				System.out.printf("me %d -------------recv append msg with leaderID %d--------------------\n", ID, amsg.getLeaderID());
+				//System.out.printf("me %d -------------recv append msg with leaderID %d--------------------\n", ID, amsg.getLeaderID());
 				state = State.Follower;
 				leaderID = amsg.getLeaderID();
 			}
@@ -305,10 +305,6 @@ public class Role implements Runnable{
 		}
 		// send back result to sender
 		sendAckAppendMsg(amsg.getLeaderID(), result);
-		if (!result) {
-			System.out.println("append Msg Handler returns:"+result);
-			System.out.println("asmg.log"+amsg.getLogs());
-		}
 	}
 
 	public synchronized void voteMsgHandler(VoteMsg vmsg) {
@@ -351,29 +347,29 @@ public class Role implements Runnable{
 		int lastCommonIndex = amsg.getPrevIndex();
 		int leaderCommittedIndex = amsg.getCommitedIndex();
 		if(lastCommonIndex < logs.size()) {
-			System.out.println("lastCommonIndex < logs.size()");
+			//System.out.println("lastCommonIndex < logs.size()");
 			if(logs.get(lastCommonIndex).getTerm() == lastCommonTerm) {
 				// first delete entries after aLastAppliedIndex
 				if(lastCommonIndex+1 < logs.size()) {
 					// see if need to delete
 					// eclipce
-					System.out.printf("leader ID is %d\n", amsg.getLeaderID());
-					System.out.printf("lastCommonIndex is %d\n", lastCommonIndex);
-					System.out.printf("log size is %d\n", logs.size());
-					for(int i = 0; i < logs.size(); ++i)
-						System.out.printf("log index %d: term: %d, real index: %d\n", 
-								i, logs.get(i).getTerm(), logs.get(i).getIndex());	
+					//System.out.printf("leader ID is %d\n", amsg.getLeaderID());
+					//System.out.printf("lastCommonIndex is %d\n", lastCommonIndex);
+					//System.out.printf("log size is %d\n", logs.size());
+					//for(int i = 0; i < logs.size(); ++i)
+					//	System.out.printf("log index %d: term: %d, real index: %d\n", 
+					//			i, logs.get(i).getTerm(), logs.get(i).getIndex());	
 					// eclipce
 					
 					writeDeleteLogs(lastCommonIndex+1, logs.size());
 					logs.subList(lastCommonIndex+1, logs.size()).clear();
-					for(int i = 0; i < logs.size(); ++i)
-						System.out.printf("log index %d: term: %d, real index: %d\n", 
-								i, logs.get(i).getTerm(), logs.get(i).getIndex());	
+					//for(int i = 0; i < logs.size(); ++i)
+					//	System.out.printf("log index %d: term: %d, real index: %d\n", 
+					//			i, logs.get(i).getTerm(), logs.get(i).getIndex());	
 				}
 				if(amsg.getLogs() != null) {
 					// second appmsg logs from the amsg
-					System.out.printf("appending log size is %d\n", amsg.getLogs().size());
+					//System.out.printf("appending log size is %d\n", amsg.getLogs().size());
 					logs.addAll(amsg.getLogs());
 					writeAppendLogs(lastCommonIndex+1, logs.size());
 				}
@@ -384,9 +380,9 @@ public class Role implements Runnable{
 				return true;
 			}
 			else {
-				System.out.println("lastCommonIndex >= logs.size()");
+				//System.out.println("lastCommonIndex >= logs.size()");
 				if(lastCommonIndex == 0) {
-					System.out.println("lastCommonIndex == 0");
+					//System.out.println("lastCommonIndex == 0");
 					//System.out.printf("lastCommonIndex : %d\n", lastCommonIndex);
 					//System.out.printf("lastCommonIndex Term : %d\n", logs.get(lastCommonIndex).getTerm());
 					//System.out.printf("lastCommonTerm Term : %d\n", lastCommonTerm);
@@ -414,7 +410,7 @@ public class Role implements Runnable{
 	}
 
 	public synchronized void writeDeleteLogs(int startIndex, int endIndex) {
-		System.out.println("I am writing to delete log..."); // LZ
+		//System.out.println("I am writing to delete log..."); // LZ
 		logFile.printf("DELETE IndexFrom: %d, IndexUntil: %d, Leader: %d\n", 
 				startIndex, endIndex, leaderID);
 		logFile.flush();
@@ -422,7 +418,7 @@ public class Role implements Runnable{
 	}
 
 	public synchronized void writeAppendLogs(int startIndex, int endIndex) {
-		System.out.println("I am writing to add log..."); //LZ
+		//System.out.println("I am writing to add log..."); //LZ
 		for(int i = startIndex; i < endIndex; ++i)
 			logFile.printf("APPEND Term: %d, Index: %d, Value: %d, Leader: %d\n", 
 					logs.get(i).getTerm(), i, logs.get(i).getIns().getValue(), leaderID);

@@ -58,7 +58,7 @@ public class Comm implements Runnable {
 		try {
 			// edited by eclipce
 			InetSocketAddress addr = sysConfig.get(recvID).getSocketAddress();
-			System.out.println("###############send des: " + addr.toString());
+			//System.out.println("###############send des: " + addr.toString());
 			assert(addr != null);
 			// edited by eclipce
 			
@@ -68,7 +68,7 @@ public class Comm implements Runnable {
 			oos.writeObject(obj);
 			byte[] data_pack = raw.toByteArray();
 			//
-			System.out.println("******************data packet size: " + data_pack.length);
+			//System.out.println("******************data packet size: " + data_pack.length);
 			//
 			raw.close();
 			oos.close();
@@ -80,12 +80,12 @@ public class Comm implements Runnable {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 			Date timeStop2 = new Date();
-			System.out.println("Failed connection time cost: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+			//System.out.println("Failed connection time cost: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
 			return;
 		}
 		//
 		Date timeStop3 = new Date();
-		System.out.println("Success connection time cost: " + (long)(timeStop3.getTime() - timeStop1.getTime()));
+		//System.out.println("Success connection time cost: " + (long)(timeStop3.getTime() - timeStop1.getTime()));
 	}
 
 	public void Terminator()
@@ -112,10 +112,10 @@ public class Comm implements Runnable {
 			//
 			while(alive)
 			{
-				System.out.println("In while!!!!!!!");
+				//System.out.println("In while!!!!!!!");
 				// LZ: accept UDP packet
 				this.server.receive(packet);
-				System.out.println("I recv packet! " + this.role.ID);
+				//System.out.println("I recv packet! " + this.role.ID);
 				// LZ: notify mallicious attack
 				/*
 				SocketAddress recv_addr = packet.getSocketAddress();

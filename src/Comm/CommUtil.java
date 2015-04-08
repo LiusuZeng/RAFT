@@ -28,7 +28,9 @@ public class CommUtil {
 
 	public static ArrayList<LogEntry> recoverLogging(File src)
 	{
+		LogEntry Dummy = new LogEntry(0, 0, new Instruction(0));
 		ArrayList<LogEntry> ret = new ArrayList<LogEntry>(0);
+		ret.add(Dummy);
 		try {
 			ArrayList<String> scripts = readByLine(src);
 			for(int i = 0; i < scripts.size(); i++)
@@ -37,7 +39,7 @@ public class CommUtil {
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.out.print("Error in local log file!");
 			return null;
 		}
@@ -48,16 +50,11 @@ public class CommUtil {
 	protected static void execSingle(List<LogEntry> ret, String step) throws Exception
 	{
 		String[] raw_data = step.split(" |,");
-		int[] para = null;
+		int[] para = new int[10];
 		int temp = -1;
 		int ptr = 0;
 		boolean flag = true;
-		if(raw_data[0].equals("DELETE")) para = new int[2];
-		else
-		{
-			para = new int[3];
-			flag = false;
-		}
+		if(!raw_data[0].equals("DELETE")) flag = false;
 		//
 		for(int i = 0; i < raw_data.length; i++)
 		{
@@ -74,6 +71,13 @@ public class CommUtil {
 		}
 		// perform execution
 		// DELETE [a,b)
+		// LZ
+		//System.out.println("PARA CONTENT:-------->");
+		//for(int i = 0; i < para.length; i++)
+		//{
+		//	System.out.println(para[i]);
+		//}
+		// LZ
 		if(flag) ret.subList(para[0], para[1]).clear();
 		// APPEND
 		else ret.add(new LogEntry(para[0], para[1], new Instruction(para[2])));

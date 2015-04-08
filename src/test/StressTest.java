@@ -43,7 +43,7 @@ public class StressTest {
 		group[sel].pause();
 		//
 		System.out.println("Stress Test Thread waits for the rest to have a new leader and modify their logs (5s)...");
-		Thread.sleep(200000);
+		Thread.sleep(20000);
 		//
 		System.out.println("Now resume the initial leader...");
 		group[sel].resume();
@@ -72,7 +72,7 @@ public class StressTest {
 			myThr[i].stop();
 			group[i].terminator();
 		}
-		Thread.sleep(20000);
+		Thread.sleep(5000);
 		//
 		System.out.println("Now check the nums...");
 		group[sel2].getLeaderInst().printfMatchIndex();

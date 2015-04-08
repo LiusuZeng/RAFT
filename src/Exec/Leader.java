@@ -83,20 +83,20 @@ public class Leader {
 		for(int index = 0; index < Constants.numServer; ++index) {
 			if(index != role.ID) {
 				// LZ
-				System.out.println("Check nextIndex:");
-				for(int i = 0; i < this.nextIndex.length; i++)
-				{
-					System.out.print(this.nextIndex[i] + " ");
-				}
-				System.out.println("Check end!");
+				//System.out.println("Check nextIndex:");
+				//for(int i = 0; i < this.nextIndex.length; i++)
+				//{
+				//	System.out.print(this.nextIndex[i] + " ");
+				//}
+				//System.out.println("Check end!");
 				//
 				Date timeStop1 = new Date(); // LZ
 				role.sendAppendMsg(index, role.getLog(nextIndex[index]-1).getTerm(), 
 						nextIndex[index]-1, role.getLogs(nextIndex[index]));
-				System.out.println("nextIndex[index]="+nextIndex[index]+" role.getLogs="+role.getLogs(nextIndex[index]));
+				//System.out.println("nextIndex[index]="+nextIndex[index]+" role.getLogs="+role.getLogs(nextIndex[index]));
 				
 				Date timeStop2 = new Date(); 
-				System.out.println("[DEBUG] @@"+index+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
+				//System.out.println("[DEBUG] @@"+index+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
 
 
 			}
