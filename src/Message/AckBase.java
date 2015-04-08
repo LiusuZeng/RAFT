@@ -15,6 +15,7 @@ public class AckBase implements Serializable {
 	
 	public AckBase(int leaderID, int term, int ID, boolean success) {
 		//super();
+		this.leaderID = leaderID;
 		this.term = term;
 		this.ID = ID;
 		this.success = success;

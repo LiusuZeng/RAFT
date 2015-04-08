@@ -221,7 +221,8 @@ public class Role implements Runnable{
 		}
 		else if(aamsg.getTerm() == term) {
 			// LZ
-			//System.out.println("aaTerm == term");
+			System.out.printf("sender id %d, sender's leader: %d", aamsg.getID(), aamsg.getLeaderID());;
+			System.out.println("===================================== == term");
 			//
 			assert(aamsg.getLeaderID() == ID);
 			// LZ
@@ -292,6 +293,7 @@ public class Role implements Runnable{
 			assert(state != State.Leader);			
 			if(leaderID == -1)
 			{
+				System.out.printf("me %d -------------recv append msg with leaderID %d--------------------\n", ID, amsg.getLeaderID());
 				state = State.Follower;
 				leaderID = amsg.getLeaderID();
 			}
