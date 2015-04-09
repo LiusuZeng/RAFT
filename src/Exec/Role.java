@@ -191,7 +191,7 @@ public class Role implements Runnable{
 		if(msg == null)
 			return;
 		else if(msg instanceof AckAppendMsg) {
-			// LZ
+			// 
 			//System.out.println("I got AckAppend Msg!!!!");
 			//
 			ackAppendMsgHandler((AckAppendMsg)msg);
