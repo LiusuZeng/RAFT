@@ -66,6 +66,14 @@ public class Role implements Runnable{
 		}
 	}
 	
+	public int getCommitIndex() {
+		return commitIndex;
+	}
+	
+	public int getAppliedIndex() {
+		return appliedIndex;
+	}
+	
 	// LZ
 	public void pause()
 	{
@@ -130,8 +138,12 @@ public class Role implements Runnable{
 	}
 
 	public synchronized void setCommitIndex(int commitIndex) {
-		assert(this.commitIndex <= commitIndex);
-		this.commitIndex = commitIndex;
+		if(this.commitIndex <= commitIndex) {
+			this.commitIndex = commitIndex;
+		}
+		else {
+			return;
+		}
 	}
 
 	public synchronized LogEntry getLog(int index) {
@@ -375,7 +387,7 @@ public class Role implements Runnable{
 					logs.addAll(amsg.getLogs());
 					writeAppendLogs(lastCommonIndex+1, logs.size());
 				}
-				commitIndex = Math.min(logs.size()-1,  leaderCommittedIndex);
+				setCommitIndex(Math.min(logs.size()-1,  leaderCommittedIndex));
 				// LZ
 				assert(appliedIndex <= commitIndex);
 				appliedIndex = commitIndex;
