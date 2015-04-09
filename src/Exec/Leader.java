@@ -50,6 +50,11 @@ public class Leader {
 		return;
 	}
 
+	public void minusNextIndexByID(int ID) {
+		--nextIndex[ID];
+		return;
+	}
+	
 	public void setMatchIndexByID(int ID, int index) {
 		assert(matchIndex[ID] <= index);
 		assert(matchIndex[ID] < nextIndex[ID]);
@@ -179,6 +184,10 @@ public class Leader {
 				long timeRemaining = Constants.heartbeatRate-currentTime.getTime()+
 						timeStamp.getTime();
 				// LZ: debug leader heartbeat timing
+//				for(int i = 0; i < 5; ++i) {
+//					System.out.printf("Leader's %d match index is %d\n", i, matchIndex[i]);
+//					System.out.printf("Leader's %d next index is %d\n", i, nextIndex[i]);
+//				}
 				/*
 				System.out.println("Calc remain time: " + timeRemaining);
 				System.out.println("timestamp time: " + timeStamp.getTime());

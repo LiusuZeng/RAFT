@@ -176,6 +176,7 @@ public class Role implements Runnable{
 	}	
 
 	public void recvMsg(Object msg) {
+		//System.out.println("hehehe \n");
 		if(msg == null)
 			return;
 		else if(msg instanceof AckAppendMsg) {
@@ -198,7 +199,7 @@ public class Role implements Runnable{
 		}
 		else {
 			// just ignore
-			//System.out.printf("i ++,  what the ** is this!\n");
+			System.out.printf("i ++,  what the ** is this!\n");
 		}
 	}
 
@@ -238,8 +239,7 @@ public class Role implements Runnable{
 			}
 			else {
 				// guess harder!
-				leader.setNextIndexByID(aamsg.getID(), 
-						aamsg.getLastIndex()-1);	
+				leader.minusNextIndexByID(aamsg.getID());	
 			}
 		}
 		else {
@@ -273,7 +273,9 @@ public class Role implements Runnable{
 		}
 	}
 
-	public synchronized void appendMsgHandler(AppendMsg amsg) {		
+	public synchronized void appendMsgHandler(AppendMsg amsg) {
+		//System.out.println("PrecIndex: "+amsg.getPrevIndex()+ " PrevTerm"+amsg.getPrevTerm());
+		//System.out.println("Mine: "+logs.get(amsg.getPrevIndex()).getTerm());
 		int aTerm = amsg.getTerm();
 		boolean result = false;
 		if(aTerm > term)
@@ -311,6 +313,9 @@ public class Role implements Runnable{
 		int voteTerm = vmsg.getCurrTerm();		
 		boolean acceptVote = false;
 		if(voteTerm > term) {
+			state = State.Follower;
+			term = voteTerm;
+			leaderID = -1;
 			int vLastTerm = vmsg.getLastAppliedTerm();
 			int vLastIndex = vmsg.getLastAppliedIndex();
 			if(vLastTerm < logs.get(logs.size()-1).getTerm()) {
@@ -323,9 +328,6 @@ public class Role implements Runnable{
 //			else if(vLastTerm >= logs.get(logs.size()-1).getTerm() && 
 //					vLastIndex >= logs.size()-1) {
 			else {
-				state = State.Follower;
-				term = voteTerm;
-				leaderID = -1;
 				votedFor = vmsg.getCandidateID();
 				// refresh timer
 				follower.refreshTimeStamp();
