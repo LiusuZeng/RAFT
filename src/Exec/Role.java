@@ -188,7 +188,6 @@ public class Role implements Runnable{
 	}	
 
 	public void recvMsg(Object msg) {
-		//System.out.println("hehehe \n");
 		if(msg == null)
 			return;
 		else if(msg instanceof AckAppendMsg) {
