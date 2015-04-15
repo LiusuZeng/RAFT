@@ -43,7 +43,7 @@ public class Role implements Runnable{
 		this.candidate = null;
 		this.follower = null;
 		this.ID = ID;
-		this.term = 0;
+		// this.term = 0;
 		this.votedFor = -1;
 		this.leaderID = -1;
 		this.comm = new Comm(this);
@@ -58,11 +58,16 @@ public class Role implements Runnable{
 	private void role_init()
 	{
 		File myLogFile = new File(Constants.logFile+ID);
-		if(myLogFile.exists()) this.logs = CommUtil.recoverLogging(myLogFile);
+		if(myLogFile.exists()) 
+			this.logs = CommUtil.recoverLogging(myLogFile);
 		if(this.logs == null || this.logs.isEmpty())
 		{
 			this.logs = new ArrayList<LogEntry>(0);
 			this.logs.add(new LogEntry(0, 0, new Instruction(0)));
+			this.term = 0;
+		}
+		else {
+			this.term = logs.get(logs.size()-1).getTerm();
 		}
 	}
 	
