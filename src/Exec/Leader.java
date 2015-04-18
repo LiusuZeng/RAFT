@@ -139,9 +139,7 @@ public class Leader {
 		int[] tmp = new int[length];
 		System.arraycopy(matchIndex, 0, tmp, 0, length );
 		Arrays.sort(tmp);
-		assert(length%2 == 1);
-
-		int result = role.getCommitIndex();
+		int result = Math.max(role.getCommitIndex(), tmp[(length+1)/2]);
 		return result;
 	}
 	
