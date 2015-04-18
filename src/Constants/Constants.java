@@ -17,4 +17,6 @@ public class Constants {
 	public static final int appendFrequency = 1;
 	// LZ
 	public static final int udpBufferSize = 65536;
+	
+	public static final int appendLogMaxSize = 100;
 }
