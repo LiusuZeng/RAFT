@@ -378,7 +378,7 @@ public class Role implements Runnable{
 					//	System.out.printf("log index %d: term: %d, real index: %d\n", 
 					//			i, logs.get(i).getTerm(), logs.get(i).getIndex());	
 					// eclipce
-					
+					assert commitIndex < lastCommonIndex+1 : "i++";
 					writeDeleteLogs(lastCommonIndex+1, logs.size());
 					logs.subList(lastCommonIndex+1, logs.size()).clear();
 					//for(int i = 0; i < logs.size(); ++i)

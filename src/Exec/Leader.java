@@ -140,7 +140,7 @@ public class Leader {
 		System.arraycopy(matchIndex, 0, tmp, 0, length );
 		Arrays.sort(tmp);
 		assert(length%2 == 1);
-		assert tmp[(length+1)/2] <= role.getCommitIndex() : " Commit Index error";
+
 		int result = role.getCommitIndex();
 		return result;
 	}
