@@ -162,7 +162,8 @@ public class Role implements Runnable{
 		if(startIndex > logs.size()-1) 
 			return null; // LZ: modified to check leader election
 		else 
-			return new ArrayList<LogEntry>(logs.subList(startIndex, logs.size()));
+			return new ArrayList<LogEntry>(logs.subList(startIndex, 
+					Math.min(logs.size(), startIndex+Constants.appendLogMaxSize)));
 	}
 
 	public int getTerm () {
