@@ -493,5 +493,11 @@ public class Role implements Runnable{
 		System.out.println("Leader: " + this.leaderID + "\n");
 
 	}
+	// LZ 04182015
+	public void printCommitIndex()
+	{
+		System.out.println("Machine " + this.ID + " commit index: " + this.commitIndex);
+	}
+	// LZ
 }
 

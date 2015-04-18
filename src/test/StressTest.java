@@ -76,7 +76,21 @@ public class StressTest {
 		//
 		System.out.println("Now check the nums...");
 		group[sel2].getLeaderInst().printfMatchIndex();
-		//
+		// LZ 04182015
+		printfRoleGrpCmtIndx(group);
+		// LZ
 		System.out.println("sel: " + sel + " sel2: " + sel2);
 	}
+	
+	// LZ 04182015
+	public static void printfRoleGrpCmtIndx(Role[] src)
+	{
+		System.out.println("*******COMMIT INDEX*******");
+		for(int i = 0; i < src.length; i++)
+		{
+			src[i].printCommitIndex();
+		}
+		System.out.println("*******PRINT END*******");
+	}
+	// LZ
 }
