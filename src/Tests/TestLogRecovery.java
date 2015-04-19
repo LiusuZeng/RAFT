@@ -1,7 +1,12 @@
 package Tests;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import Comm.CommUtil;
 import Message.Instruction;
@@ -48,7 +53,7 @@ public class TestLogRecovery {
 		// APPEND
 		for(int i = 0; i < 10; i++)
 		{
-			this.SingleExec(false, (int)(i/3+1), i, myrand.nextInt(100));
+			this.SingleExec(false, i/3+1, i, myrand.nextInt(100));
 		}
 		// DELETE
 		for(int x = 0; x < 3; x++)

@@ -9,6 +9,7 @@ import Message.LogEntry;
 
 public class StressTest {
 
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws IOException, InterruptedException {
 		// TODO Auto-generated method stub
 		System.out.println("Stress Test parameters initializing...");

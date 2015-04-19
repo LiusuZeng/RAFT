@@ -40,4 +40,8 @@ public class LogEntry implements Serializable{
 			return false;
 		}
 	}
+	
+	public int hashCode() {
+		return 0;
+	}
 }

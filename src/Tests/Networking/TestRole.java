@@ -1,14 +1,14 @@
 package Tests.Networking;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 import Exec.Role;
 import Message.AckAppendMsg;
 import Message.AckVoteMsg;
 import Message.AppendMsg;
 import Message.LogEntry;
 import Message.VoteMsg;
-
-import java.util.*;
-import java.io.*;
 
 public class TestRole extends Role {
 
