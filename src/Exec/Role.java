@@ -37,7 +37,7 @@ public class Role implements Runnable{
 	// other parameters
 	protected boolean alive;
 
-	public Role(int ID) throws Exception {
+	public Role(int ID) throws IOException {
 		this.state = State.Follower;
 		this.leader = null;
 		this.candidate = new Candidate(this);
@@ -56,13 +56,13 @@ public class Role implements Runnable{
 		this.comm = new Comm(this);
 	}
 
-	private void role_init() throws Exception
+    private void role_init()
 	{
 		File myLogFile = new File(Constants.logFile+ID);
 		if(myLogFile.exists())
 		{
 			this.logs = CommUtil.recoverLogging(myLogFile);
-			if(this.logs == null) throw new Exception("SHIT");
+			//if(this.logs == null) throw new Exception("SHIT");
 		}
 		if(this.logs == null || this.logs.isEmpty())
 		{
