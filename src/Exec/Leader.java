@@ -96,6 +96,7 @@ public class Leader {
 				//System.out.println("Check end!");
 				//
 				Date timeStop1 = new Date(); // LZ
+				assert nextIndex[index] > 0 : "assert fails, next index of leader is " + nextIndex[index] + " , id is "+index;
 				role.sendAppendMsg(index, role.getLog(nextIndex[index]-1).getTerm(), 
 						nextIndex[index]-1, role.getLogs(nextIndex[index]));
 				//System.out.println("nextIndex[index]="+nextIndex[index]+" role.getLogs="+role.getLogs(nextIndex[index]));
