@@ -327,6 +327,7 @@ public class Role implements Runnable{
 			leaderID = -1;
 			int vLastTerm = vmsg.getLastAppliedTerm();
 			int vLastIndex = vmsg.getLastAppliedIndex();
+			assert logs != null : "log is null , what?";
 			if(vLastTerm < logs.get(logs.size()-1).getTerm()) {
 				// do nothing
 			}
