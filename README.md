@@ -37,9 +37,9 @@ Leader election is the foundation of the Raft consensus algorithm. Each node wil
 
 A node will start as follower, when this node cannot receive the heartbeat message sent by the leader, this node will timeout and become a candidate and send out vote requests to every node. 
 
-Nodes when receiving a vote request, will respond with either yes or no depending on whether the candidate’s log is up to date. 
+Nodes, when receiving a vote request, will respond with either yes or no depending on whether the candidate’s log is up to date. 
 
-Once a candidate get more than half yes response, the candidate will become a leader and start sending out heartbeat messages.
+Once a candidate get more than half yes responses, the candidate will become a leader and start sending out heartbeat messages.
 A candidate will timeout and retry when there is a split vote.
 
 <h4>Log Replication</h4>
@@ -48,7 +48,7 @@ Log replication is another key part of the Raft consensus algorithm.
 
 The leader will never delete or change its own log entries.
 
-When receiving requests from clients, the leader will send out log replication message (the AppendEntries RPC) to all other nodes and seek the last common index, the last index where the leader and followers has the same term, based on responses, and append leader's log to follower's from the last common index. 
+When receiving requests from clients, the leader will send out log replication message (the AppendEntries RPC) to all other nodes and seek the last common index, the last index where the leader and followers share the same term, based on responses, and append leader's log to follower's from the last common index. 
 
 Once one index is successfully replicated over majority of servers, this index is considered committed and will be applied to every nodes’ finite state machine.
 
@@ -73,7 +73,7 @@ Because of random time out, it is very likely that a new leader will emerge, whi
 
 We simulate a system consists of 5 servers. Their IDs are from 0 to 4. They communicate through socket like the communication in Chord. The socket addresses for these 5 servers are written in **configuration.in** file.
 
-Instead of using a client to send command (i.e. new log entry), we let the current leader to generate random new log entry and try to append it to all other servers every 40 ms. If the system works well, all the servers should have the same log as leader's.
+Instead of using a client to send command (i.e. new log entry), we let the current leader to generate a random new log entry and try to append it to all other servers every 40 ms. If the system works well, all the servers should have the same log as leader's.
 
 <br>
 
