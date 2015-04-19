@@ -37,7 +37,7 @@ public class Role implements Runnable{
 	// other parameters
 	protected boolean alive;
 
-	public Role(int ID) throws IOException {
+	public Role(int ID) throws Exception {
 		this.state = State.Follower;
 		this.leader = null;
 		this.candidate = new Candidate(this);
@@ -46,20 +46,24 @@ public class Role implements Runnable{
 		// this.term = 0;
 		this.votedFor = -1;
 		this.leaderID = -1;
-		this.comm = new Comm(this);
 		this.alive = true;
 		this.commitIndex = -1;
 		this.appliedIndex = -1;
 		//
 		this.role_init();
 		this.logFile = new PrintWriter(new FileWriter(Constants.logFile+ID, true));
+		//
+		this.comm = new Comm(this);
 	}
 
-	private void role_init()
+	private void role_init() throws Exception
 	{
 		File myLogFile = new File(Constants.logFile+ID);
-		if(myLogFile.exists()) 
+		if(myLogFile.exists())
+		{
 			this.logs = CommUtil.recoverLogging(myLogFile);
+			if(this.logs == null) throw new Exception("SHIT");
+		}
 		if(this.logs == null || this.logs.isEmpty())
 		{
 			this.logs = new ArrayList<LogEntry>(0);
@@ -70,38 +74,38 @@ public class Role implements Runnable{
 			this.term = logs.get(logs.size()-1).getTerm();
 		}
 	}
-	
+
 	public int getCommitIndex() {
 		return commitIndex;
 	}
-	
+
 	public int getAppliedIndex() {
 		return appliedIndex;
 	}
-	
+
 	// LZ
 	public void pause()
 	{
 		this.comm.Terminator();
 	}
-	
+
 	public void resume() throws SocketException
 	{
 		this.comm = new Comm(this);
 	}
-	
+
 	public void terminator()
 	{
 		this.comm.Terminator();
 		this.alive = false;
 	}
-	
+
 	public Leader getLeaderInst()
 	{
 		return this.leader;
 	}
 	//
-	
+
 	public void run() {
 		// TODO Auto-generated method stub
 		while(isAlive()) {
@@ -324,7 +328,15 @@ public class Role implements Runnable{
 		if(voteTerm > term) {			
 			int vLastTerm = vmsg.getLastAppliedTerm();
 			int vLastIndex = vmsg.getLastAppliedIndex();
-			assert logs != null : "log is null , what?";
+			// LZ debug
+			if(this.logs == null)
+			{
+				System.out.println("Machine " + this.ID + " log null bug!");
+				System.out.println(vmsg.toString());
+				System.out.println("Size of logs: " + logs.size());
+			}
+			//
+			//assert logs != null : "log is null , what?";
 			if(vLastTerm < logs.get(logs.size()-1).getTerm()) {
 				// do nothing
 			}
@@ -332,8 +344,8 @@ public class Role implements Runnable{
 					vLastIndex < logs.size()-1) {
 				// do nothing
 			}
-//			else if(vLastTerm >= logs.get(logs.size()-1).getTerm() && 
-//					vLastIndex >= logs.size()-1) {
+			//			else if(vLastTerm >= logs.get(logs.size()-1).getTerm() && 
+			//					vLastIndex >= logs.size()-1) {
 			else {
 				votedFor = vmsg.getCandidateID();
 				// refresh timer
@@ -373,9 +385,9 @@ public class Role implements Runnable{
 					//for(int i = 0; i < logs.size(); ++i)
 					//	System.out.printf("log index %d: term: %d, real index: %d\n", 
 					//			i, logs.get(i).getTerm(), logs.get(i).getIndex());	
-					
+
 					// first eliminate same log (in case the ackAppendMsg is lost)
-					
+
 					if(logFromLeader != null) {
 						for(int index = 0; 
 								index < logFromLeader.size() && 
@@ -389,16 +401,16 @@ public class Role implements Runnable{
 						}
 					}
 					// eclipce
-					
+
 					if(lastCommonIndex+1 < logs.size()) {
 						try {
 							assert commitIndex < lastCommonIndex+1 : "i++" + commitIndex + "lastCommonIndex" + lastCommonIndex;
 						}
 						catch (AssertionError e) {
-					      String message = e.getMessage();
-					      System.out.println(message);
-					    }
-						
+							String message = e.getMessage();
+							System.out.println(message);
+						}
+
 						writeDeleteLogs(lastCommonIndex+1, logs.size());
 						logs.subList(lastCommonIndex+1, logs.size()).clear();
 						assert logs != null : "gotcha!";
@@ -471,11 +483,11 @@ public class Role implements Runnable{
 		AppendMsg amsg = new AppendMsg(term, prevTerm, prevIndex, ID,
 				commitIndex, logToAppend);
 		// call COMM function to send
-		
+
 		//Date timeStop1 = new Date(); // LZ
-		
+
 		comm.send(recvID, amsg);
-		
+
 		//Date timeStop2 = new Date(); 
 		//System.out.println("[DEBUG] @@"+recvID+"@@ time cost of setCommit: " + (long)(timeStop2.getTime() - timeStop1.getTime()));
 
@@ -502,7 +514,7 @@ public class Role implements Runnable{
 		AckVoteMsg avmsg = new AckVoteMsg(recvID, term, ID, success);
 		comm.send(recvID, avmsg);
 	}
-	
+
 	// LZ debug
 	public void printDebug()
 	{
