@@ -347,6 +347,7 @@ public class Role implements Runnable{
 			else {
 				votedFor = vmsg.getCandidateID();
 				// refresh timer
+				state = State.Follower;
 				follower.refreshTimeStamp();
 				acceptVote = true;
 			}
@@ -369,6 +370,8 @@ public class Role implements Runnable{
 			//System.out.println("lastCommonIndex < logs.size()");
 			if(logs.get(lastCommonIndex).getTerm() == lastCommonTerm) {
 				// first delete entries after aLastAppliedIndex
+				List<LogEntry> logFromLeader = amsg.getLogs();
+				int logFromLeaderIndex = 0;
 				if(lastCommonIndex+1 < logs.size()) {
 					// see if need to delete
 					// eclipce
@@ -378,18 +381,43 @@ public class Role implements Runnable{
 					//for(int i = 0; i < logs.size(); ++i)
 					//	System.out.printf("log index %d: term: %d, real index: %d\n", 
 					//			i, logs.get(i).getTerm(), logs.get(i).getIndex());	
+					
+					// first eliminate same log (in case the ackAppendMsg is lost)
+					
+					if(logFromLeader != null) {
+						for(int index = 0; 
+								index < logFromLeader.size() && 
+								lastCommonIndex+1+index < logs.size(); 
+								++index) {
+							boolean result = logFromLeader.get(index).equals(logs.get(lastCommonIndex+1+index));
+							if(result == true) {
+								++lastCommonIndex;
+								++logFromLeaderIndex;
+							}
+						}
+					}
 					// eclipce
-					assert commitIndex < lastCommonIndex+1 : "i++";
-					writeDeleteLogs(lastCommonIndex+1, logs.size());
-					logs.subList(lastCommonIndex+1, logs.size()).clear();
+					
+					if(lastCommonIndex+1 < logs.size()) {
+						try {
+							assert commitIndex < lastCommonIndex+1 : "i++" + commitIndex + "lastCommonIndex" + lastCommonIndex;
+						}
+						catch (AssertionError e) {
+					      String message = e.getMessage();
+					      System.out.println(message);
+					    }
+						
+						writeDeleteLogs(lastCommonIndex+1, logs.size());
+						logs.subList(lastCommonIndex+1, logs.size()).clear();
+					}
 					//for(int i = 0; i < logs.size(); ++i)
 					//	System.out.printf("log index %d: term: %d, real index: %d\n", 
 					//			i, logs.get(i).getTerm(), logs.get(i).getIndex());	
 				}
-				if(amsg.getLogs() != null) {
+				if(logFromLeader != null && logFromLeaderIndex < logFromLeader.size()) {
 					// second appmsg logs from the amsg
 					//System.out.printf("appending log size is %d\n", amsg.getLogs().size());
-					logs.addAll(amsg.getLogs());
+					logs.addAll(logFromLeader.subList(logFromLeaderIndex, logFromLeader.size()));
 					writeAppendLogs(lastCommonIndex+1, logs.size());
 				}
 				setCommitIndex(Math.min(logs.size()-1,  leaderCommittedIndex));
@@ -491,8 +519,9 @@ public class Role implements Runnable{
 		System.out.println("Term: " + this.getTerm());
 		System.out.println("Last Index: " + this.getLastIndex());
 		System.out.println("Voted for: " + this.getVotedFor());
-		System.out.println("Leader: " + this.leaderID + "\n");
-
+		System.out.println("Leader: " + this.leaderID);
+		System.out.println("CommitIndex: " + this.commitIndex);
+		System.out.println("***[unDEBUG]***\n");
 	}
 	// LZ 04182015
 	public void printCommitIndex()

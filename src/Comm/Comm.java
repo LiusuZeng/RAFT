@@ -73,6 +73,7 @@ public class Comm implements Runnable {
 			raw.close();
 			oos.close();
 			// LZ: get send addr info and construct UDP packet
+			assert data_pack.length <= 65508 : "actual size is" + data_pack.length;
 			DatagramPacket toBsent = new DatagramPacket(data_pack, data_pack.length, addr);
 			this.server.send(toBsent);
 			
@@ -133,7 +134,7 @@ public class Comm implements Runnable {
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			// e.printStackTrace();
 			System.out.println("Machine " + this.role.ID + " resources retrieved!");
 			return;
 		}

@@ -30,4 +30,14 @@ public class LogEntry implements Serializable{
 	public Instruction getIns() {
 		return ins;
 	}
+	
+	public boolean equals(Object obj) {
+		if(obj instanceof LogEntry) {
+			LogEntry rhs = (LogEntry)obj;
+			return rhs.term == this.term && rhs.index == this.index;
+		}
+		else {
+			return false;
+		}
+	}
 }

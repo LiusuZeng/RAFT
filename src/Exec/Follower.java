@@ -35,8 +35,7 @@ public class Follower {
 				role.printDebug();
 				//
 				assert(role.getState() == State.Follower);
-				if(isTimeout()) {
-					role.elect();
+				if(isTimeout()) {					
 					Random new_rand = new Random();
 					try {
 						role.wait(new_rand.nextInt((int) Constants.heartbeatTimeout));
@@ -44,6 +43,7 @@ public class Follower {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					role.elect();
 					return;
 				}
 				else
