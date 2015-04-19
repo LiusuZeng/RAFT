@@ -321,10 +321,7 @@ public class Role implements Runnable{
 	public synchronized void voteMsgHandler(VoteMsg vmsg) {
 		int voteTerm = vmsg.getCurrTerm();		
 		boolean acceptVote = false;
-		if(voteTerm > term) {
-			state = State.Follower;
-			term = voteTerm;
-			leaderID = -1;
+		if(voteTerm > term) {			
 			int vLastTerm = vmsg.getLastAppliedTerm();
 			int vLastIndex = vmsg.getLastAppliedIndex();
 			assert logs != null : "log is null , what?";
@@ -341,6 +338,8 @@ public class Role implements Runnable{
 				votedFor = vmsg.getCandidateID();
 				// refresh timer
 				state = State.Follower;
+				term = voteTerm;
+				leaderID = -1;
 				follower.refreshTimeStamp();
 				acceptVote = true;
 			}
