@@ -40,8 +40,8 @@ public class Role implements Runnable{
 	public Role(int ID) throws IOException {
 		this.state = State.Follower;
 		this.leader = null;
-		this.candidate = null;
-		this.follower = null;
+		this.candidate = new Candidate(this);
+		this.follower = new Follower(this);
 		this.ID = ID;
 		// this.term = 0;
 		this.votedFor = -1;
@@ -107,21 +107,13 @@ public class Role implements Runnable{
 		while(isAlive()) {
 			switch(state) {
 			case Follower:
-				if(follower == null) {
-					follower = new Follower(this);
-				}
 				follower.run();
 				break;
 			case Candidate:
-				if(candidate == null) {
-					candidate = new Candidate(this);
-				}
 				candidate.run();
 				break;
 			case Leader:
-				if(leader == null) {
-					leader = new Leader(this);
-				}
+				leader = new Leader(this);
 				leader.run();
 				break;
 			default:
